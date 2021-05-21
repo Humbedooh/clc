@@ -15,7 +15,6 @@ import time
 import yaml
 import fnmatch
 
-re_word = re.compile(r"\b([a-z]+)\b")
 LOCK = threading.Lock()
 MERGE_ISSUES = False
 
@@ -54,11 +53,11 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
                 line_no = 0
                 for line in f:
                     line_no += 1
-                    word_no = 0
                     line_lowercase = line.lower()
                     for bad_word in bad_words:
                         if bad_word in line_lowercase:
                             bad_word_re = bad_words_re[bad_word]
+                            word_no = 0
                             for word in bad_word_re.finditer(line_lowercase):
                                 word_no += 1
                                 matched_word = word.group(1)
@@ -66,11 +65,11 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
                                 ctx_end = min(len(line), word.end(1) + 64)
                                 try:
                                     if any(
-                                            ctx and re.search(ctx, line, flags=re.IGNORECASE)
+                                            ctx and re.search(ctx, line_lowercase)
                                             for ctx in excludes_context
                                     ):
                                         continue
-                                except SyntaxError:
+                                except SyntaxError:  # Bad regex
                                     pass
                                 LOCK.acquire(blocking=True)
                                 print(f"#{tid}: Found potential issue in {file} on line {line_no}: {matched_word}")
@@ -150,7 +149,7 @@ async def scan_project(server, path):
         bad_words_stacked = {}
         bad_words_re = {}
         for word in bad_words:
-            bad_words_re[word] = re.compile(r"(?:\b|\W)(" + word + r")(?:\b|\W)")
+            bad_words_re[word] = re.compile(r"(?:\b|\W|_)+(" + word + r")(?:ed|ing|s)?(?:\b|\W|_)+", flags=re.UNICODE)
             bad_words_stacked[word] = 0
 
         # How many files and when did we start scanning
