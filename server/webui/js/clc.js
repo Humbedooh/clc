@@ -196,7 +196,7 @@ async function prime_intro() {
             no_issues += stats[repo][2][stats[repo][2].length-1];
             no_files += stats[repo][1][stats[repo][1].length-1];
         }
-        if (n > 14) continue
+        if (n > 6) continue
         let a = document.createElement('a');
         a.setAttribute('href', `analysis.html?project=${repo}`);
         let div = document.createElement('div');
@@ -212,8 +212,8 @@ async function prime_intro() {
                 text: repo
             },
             size: {
-                height: 200,
-                width: 550
+                height: 220,
+                width: 600
             },
             axis: {
                 x: {
