@@ -1,3 +1,5 @@
+
+![logo](https://raw.githubusercontent.com/Humbedooh/clc/main/logo.svg) 
 # CLC - Conscious Language Checker
 
 
