@@ -147,7 +147,7 @@ class Server(plugins.basetypes.Server):
         await runner.setup()
         site = aiohttp.web.TCPSite(runner, self.config.server.ip, self.config.server.port)
         await site.start()
-        print("==== Serving up CLC good vibes at %s:%s ====" % (self.config.server.ip, self.config.server.port))
+        print("==== Serving up CLC good vibes at http://%s:%s ====" % (self.config.server.ip, self.config.server.port))
         await plugins.background.run_tasks(self)
 
     def run(self):
