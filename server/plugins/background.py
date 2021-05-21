@@ -5,31 +5,91 @@ import time
 
 import plugins.basetypes
 import plugins.configuration
+import plugins.offloader
 import asyncio
 import os
-import aiofiles
+import queue
+import threading
 import re
 import time
 import yaml
 import fnmatch
 
 re_word = re.compile(r"\b([a-z]+)\b")
+LOCK = threading.Lock()
+MERGE_ISSUES = False
 
-
-class ProgTimer:
-    """A simple task timer that displays when a sub-task is begun, ends, and the time taken."""
-
-    def __init__(self, title):
-        self.title: str = title
-        self.time: float = time.time()
-
-    async def __aenter__(self):
-        sys.stdout.write("[%s] %s...\n" % (datetime.datetime.now().strftime("%H:%M:%S"), self.title))
-        sys.stdout.flush()
-        self.start = time.time()
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        print("[%s] Done in %.2f seconds" % (datetime.datetime.now().strftime("%H:%M:%S"), time.time() - self.start))
+def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, bad_words_re, excludes_context):
+    current_issues = []
+    bad_words_stacked = {}
+    no_files = files.qsize()
+    f_p = 0
+    now = time.time()
+    while files.qsize():
+        try:
+            LOCK.acquire(blocking=True)
+            file = files.get(block=True, timeout=2)
+            files_processed = no_files - files.qsize()
+            pct = int(files_processed * 100 / no_files)
+            duration = int(time.time() - now)
+            server.data.activity = f"Scanning {path}. Currently {pct}% done ({files_processed} out of {no_files} files scanned, {duration} seconds spent)"
+            LOCK.release()
+        except:
+            print("Thread broke or queue emptied, exiting...")
+            try:
+                LOCK.release()
+            except RuntimeError:  # Can't unlock an unlocked lock
+                pass
+            break
+        if os.path.islink(file):
+            continue  # no symlinks, please
+        if any(
+                fnmatch.fnmatch(file, foo) or fnmatch.fnmatch(file.replace(path, "", 1).lstrip("/"), foo)
+                for foo in excludes
+        ):
+            continue  # don't match excludes
+        try:
+            with open(file, encoding="utf-8") as f:
+                f_p += 1
+                line_no = 0
+                for line in f:
+                    line_no += 1
+                    word_no = 0
+                    line_lowercase = line.lower()
+                    for bad_word in bad_words:
+                        if bad_word in line_lowercase:
+                            bad_word_re = bad_words_re[bad_word]
+                            for word in bad_word_re.finditer(line_lowercase):
+                                word_no += 1
+                                matched_word = word.group(1)
+                                ctx_start = max(0, word.start(1) - 64)
+                                ctx_end = min(len(line), word.end(1) + 64)
+                                try:
+                                    if any(
+                                            ctx and re.search(ctx, line, flags=re.IGNORECASE)
+                                            for ctx in excludes_context
+                                    ):
+                                        continue
+                                except SyntaxError:
+                                    pass
+                                LOCK.acquire(blocking=True)
+                                print(f"#{tid}: Found potential issue in {file} on line {line_no}: {matched_word}")
+                                LOCK.release()
+                                bad_words_stacked[matched_word] =  bad_words_stacked.get(matched_word, 0) + 11
+                                current_issues.append(
+                                    {
+                                        "path": file,
+                                        "line": line_no,
+                                        "mark": word_no,
+                                        "word": matched_word,
+                                        "reason": bad_words[matched_word],
+                                        "context": line[ctx_start:ctx_end].strip(),
+                                        "resolution": None,
+                                    }
+                                )
+        except UnicodeDecodeError:
+            pass  # Binary file
+    return current_issues, bad_words_stacked, f_p
 
 
 async def scan_project(server, path):
@@ -90,68 +150,33 @@ async def scan_project(server, path):
         bad_words_stacked = {}
         bad_words_re = {}
         for word in bad_words:
-            bad_words_re[word] = re.compile(r"\b(" + word + r")\b")
+            bad_words_re[word] = re.compile(r"(?:\b|\W)(" + word + r")(?:\b|\W)")
             bad_words_stacked[word] = 0
 
         # How many files and when did we start scanning
         no_files = len(all_files)
         now = time.time()
 
-        # Okay, start the scan!
-        for file in sorted(all_files):
-            pct = int(files_processed * 100 / no_files)
-            duration = int(time.time() - now)
-            server.data.activity = f"Scanning {path}. Currently {pct}% done ({files_processed} out of {no_files} files scanned, {duration} seconds spent)"
-            if os.path.islink(file):
-                continue  # no symlinks, please
-            if any(
-                fnmatch.fnmatch(file, foo) or fnmatch.fnmatch(file.replace(path, "", 1).lstrip("/"), foo)
-                for foo in excludes
-            ):
-                continue  # don't match excludes
-            try:
-                async with aiofiles.open(file, encoding="utf-8") as f:
-                    line_no = 0
-                    async for line in f:
-                        line_no += 1
-                        bytes_processed += len(line)
-                        word_no = 0
-                        line_lowercase = line.lower()
-                        for bad_word in bad_words:
-                            if bad_word in line_lowercase:
-                                bad_word_re = bad_words_re[bad_word]
-                                for word in bad_word_re.finditer(line_lowercase):
-                                    word_no += 1
-                                    matched_word = word.group(1)
-                                    ctx_start = max(0, word.start(1) - 64)
-                                    ctx_end = min(len(line), word.end(1) + 64)
-                                    try:
-                                        if any(
-                                            ctx and re.search(ctx, line, flags=re.IGNORECASE)
-                                            for ctx in excludes_context
-                                        ):
-                                            continue
-                                    except SyntaxError:
-                                        pass
-                                    print(f"Found potential issue in {file} on line {line_no}: {matched_word}")
-                                    bad_words_stacked[matched_word] += 1
-                                    problems_found += 1
-                                    current_issues.append(
-                                        {
-                                            "path": file,
-                                            "line": line_no,
-                                            "mark": word_no,
-                                            "word": matched_word,
-                                            "reason": bad_words[matched_word],
-                                            "context": line[ctx_start:ctx_end].strip(),
-                                            "resolution": None,
-                                        }
-                                    )
-                    files_processed += 1
-            except UnicodeDecodeError:
-                pass  # Binary file
-            # if files_processed % 100 == 0:
-            #     print(f"Processed {files_processed} out of {len(all_files)} files in {path}...")
+        runners = plugins.offloader.ExecutorPool(threads=10)
+
+        awaits = []
+        all_files_thrd = queue.Queue()
+        for file in all_files:
+            all_files_thrd.put_nowait(file)
+
+        for i in range(0, 4):
+            awaits.append(asyncio.create_task(runners.run(process_files, i, server, all_files_thrd, path, excludes, bad_words, bad_words_re, excludes_context)))
+
+        for x in awaits:
+            problems_tmp, bad_words_tmp, f_p = await x
+            files_processed += f_p
+            if problems_tmp:
+                current_issues.extend(problems_tmp)
+                problems_found += len(problems_tmp)
+            if bad_words_tmp:
+                for k, v in bad_words_tmp.items():
+                    bad_words_stacked[k] += v
+
         taken = time.time() - now
         print(
             f"Processed {path} in {int(taken)} seconds, found {problems_found} potential issues in {files_processed} text files."
@@ -172,20 +197,26 @@ async def scan_project(server, path):
         # Compile current issues, merging in old ones
         clc_issues = []
         clc_issues_file = os.path.join(path, "_clc_issues.yaml")
-        if os.path.exists(clc_issues_file):
-            clc_issues = yaml.safe_load(open(clc_issues_file))
-        for issue in current_issues:
-            for old_issue in clc_issues:
-                if old_issue["path"] == issue["path"]:
-                    if old_issue["line"] in ("*", issue["line"]) and old_issue["word"] == issue["word"]:
-                        issue["resolution"] = old_issue["resolution"]
-                        issue["line"] = old_issue["line"]
-                        issue["word"] = old_issue["word"]
-                        if issue["resolution"] == "ignore":
-                            problems_found -= 1
+        if MERGE_ISSUES:
+            if os.path.exists(clc_issues_file):
+                clc_issues = yaml.safe_load(open(clc_issues_file))
+            for issue in current_issues:
+                for old_issue in clc_issues:
+                    if old_issue["path"] == issue["path"]:
+                        if old_issue["line"] in ("*", issue["line"]) and old_issue["word"] == issue["word"]:
+                            issue["resolution"] = old_issue["resolution"]
+                            issue["line"] = old_issue["line"]
+                            issue["word"] = old_issue["word"]
+                            if issue["resolution"] == "ignore":
+                                problems_found -= 1
 
         yaml.dump(yml, open(os.path.join(path, "_clc.yaml"), "w"))
-        yaml.dump(current_issues, open(clc_issues_file, "w"))
+        # Writing issues could take AGES, so we offload to a thread
+        server.data.activity = f"Writing report for last scan of {path}...could take a while."
+        print("Writing issue YAML...")
+        current_issues = sorted(current_issues, key=lambda x: x["path"])
+        await runners.run(yaml.dump, current_issues, open(clc_issues_file, "w"))
+        print("Done, back to idling.")
         yaml.dump(scan_history, open(history_file, "w"))
     else:
         print(f"Could not pull in latest changes for {path}, ignoring for now...")
