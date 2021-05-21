@@ -75,7 +75,7 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
                                 LOCK.acquire(blocking=True)
                                 print(f"#{tid}: Found potential issue in {file} on line {line_no}: {matched_word}")
                                 LOCK.release()
-                                bad_words_stacked[matched_word] =  bad_words_stacked.get(matched_word, 0) + 11
+                                bad_words_stacked[matched_word] = bad_words_stacked.get(matched_word, 0) + 1
                                 current_issues.append(
                                     {
                                         "path": file,
