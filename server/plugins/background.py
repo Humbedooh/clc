@@ -120,8 +120,7 @@ async def scan_project(server, path):
                         for bad_word in bad_words:
                             if bad_word in line_lowercase:
                                 bad_word_re = bad_words_re[bad_word]
-                                word = bad_word_re.search(line_lowercase)
-                                if word:
+                                for word in bad_word_re.finditer(line_lowercase):
                                     word_no += 1
                                     matched_word = word.group(1)
                                     ctx_start = max(0, word.start(1) - 64)
