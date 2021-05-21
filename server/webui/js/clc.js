@@ -373,6 +373,15 @@ async function prime_analysis(limit) {
         data: {
             columns: stats.breakdown,
             type: 'donut'
+        },
+        tooltip: {
+            format: {
+                //title: function (d) { return 'Data ' + d; },
+                value: function (value, ratio, id) {
+                    console.log(value, ratio);
+                    return value.pretty() + " (" + (parseInt(ratio*1000) / 10.0) + "%)";
+                }
+            }
         }
     });
 
