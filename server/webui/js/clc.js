@@ -458,7 +458,7 @@ async function prime_analysis(limit) {
         td.setAttribute('class', 'table-expand-row-nested');
         let p = document.createElement('p');
         p.innerText = issue.context;
-        $(p).html($(p).text().replace('<', '&lt;').replace(new RegExp("\\b" + issue.word + "\\b", 'i'), `<strong style="color: #950;">${issue.word.replace('<', '&lt;')}</strong>`));
+        $(p).html($(p).text().replace('<', '&lt;').replace(new RegExp("((\\b|_|\W)" + issue.word + "(ed|ing|s)?(?:\\b|\\W|_)+)", 'i'), (a) => `<strong style="color: #950;">${a.replace('<', '&lt;')}</strong>`));
         td.appendChild(p);
         tr.appendChild(td);
         issues_parent.appendChild(tr);
