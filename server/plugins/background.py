@@ -79,7 +79,8 @@ async def scan_project(server, path):
         for root_path, directories, files in os.walk(path):
             if "/.git" in root_path:
                 continue
-            all_files.extend([os.path.join(root_path, file) for file in files if "_clc" not in file])
+            # Grab all files except those starting with _clc, which is our yaml files.
+            all_files.extend([os.path.join(root_path, file) for file in files if not file.startswith("_clc")])
         files_processed = 0
         bytes_processed = 0
         problems_found = 0
