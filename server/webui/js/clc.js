@@ -1,10 +1,5 @@
 let repository = null;
-let reasons = {
-    historical: "This word has bad historical connotations and should be avoided where possible",
-    race: "This word has a potentially denigrating effect on people of color",
-    gendered: "This word is gendered. Where possible, please use they/them/one instead",
-    ableism: "This word may be hurtful to people with mental or physical disabilities"
-};
+let reasons = {};
 
 
 async function POST(url = '', data = {}) {
@@ -301,6 +296,7 @@ async function prime_analysis(limit) {
     let no_issues = 0;
     let no_handled = 0;
     repository = stats.repo;
+    reasons = stats.reasons;
 
     for (let z = 1; z < stats.chart[0].length; z++) {
         stats.chart[0][z] = new Date(stats.chart[0][z]*1000.0);

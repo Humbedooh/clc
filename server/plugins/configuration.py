@@ -37,6 +37,7 @@ class Configuration:
         self.words = dyml.get("words", [])
         self.excludes = dyml.get("excludes", [])
         self.excludes_context = dyml.get("excludes_context", [])
+        self.contexts = dyml.get("contexts", [])
         self.executables = yml.get("executables", {})
         assert "git" in self.executables and os.path.exists(self.executables["git"]), \
             "This service requires the git executable installed. If it is already installed, " \
