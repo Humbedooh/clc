@@ -1,0 +1,94 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CLC | Projects</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/1.2.3/motion-ui.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/css/foundation-prototype.min.css">
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css' rel='stylesheet' type='text/css'>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.css" rel="stylesheet" type="text/css">
+  <link href="/css/clc.css" rel="stylesheet" type="text/css">
+  <!-- optional CDN for Foundation Icons ^^ -->
+</head>
+<body onload="prime_projects_list();">
+
+
+<!-- Start Top Bar -->
+<div class="topbar-responsive">
+  <div class="top-bar-left">
+    <ul class="menu">
+      <li class="menu-text">CLC - Conscious Language Checker</li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/about.html">About</a></li>
+      <li><a href="/projects.html">Analyzed Projects</a></li>
+    </ul>
+  </div>
+
+</div>
+<!-- End Top Bar -->
+
+<article class="grid-container">
+  <h2>All projects</h2>
+  <a href="#" onclick="document.getElementById('add_project').style.display='block';" class="button">Add a new project</a>
+  <div class="grid-x grid-margin-x medium-up-3 large-up-4" id="projects">
+
+    <div id="add_project" style="display: none; width: 100%; background: #EEF; padding: 8px;">
+      <h4>Add a new project repository:</h4>
+    Repository URL: <input type="text" id="repo_url" placeholder="https://github.com/apache/foo.git">
+      <small>Must be a publicly accessible URL ending in .git</small><hr/>
+      Branch: <input type="text" id="branch" placeholder="main">
+      <small>For instance main or master. Leave blank to check out the default branch of the repository</small>
+      <hr/>
+      <big>Scanner defaults: <small>(you can always adjust these settings later)</small></big><br/><br/>
+      <div class="grid-x grid-margin-x medium-up-3 large-up-3" id="settings">
+        <div class="cell">
+          Excludes files (GLOB):<br/>
+          <textarea id="excludes" style="height: 120px;"></textarea>
+        </div>
+        <div class="cell">
+          Bad words and context:<br/>
+          <textarea id="words" style="height: 120px;"></textarea>
+          <small><i><kbd>word: context</kbd> key/value pairs of bad words and their context</i></small>
+        </div>
+        <div class="cell">
+          Bad words exclude contexts:<br/>
+          <textarea id="excludes_context" style="height: 120px;"></textarea>
+          <small><i>This must be a list of regular expressions that matches contexts in which to ignore bad words.</i></small>
+        </div>
+      </div>
+
+    <input type="button" class="button" value="Add repository" onclick="add_repo();">
+    </div>
+    <table class="table-expand">
+      <thead>
+      <tr class="table-expand-row">
+        <th>Project</th>
+        <th>Source</th>
+        <th class="text-right">Issues found</th>
+        <th class="text-right">Files processed</th>
+      </tr>
+      </thead>
+      <tbody id="projects_parent">
+      </tbody>
+    </table>
+  </div>
+
+  <hr>
+</article>
+
+
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.4.3/js/foundation.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/motion-ui/1.2.3/motion-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.13.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.7.20/c3.min.js"></script>
+
+<script src="/js/clc.js" type="text/javascript"></script>
+<script>
+  $(document).foundation();
+</script>
+</body>
+</html>
