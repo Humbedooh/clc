@@ -31,6 +31,10 @@ words:
   lame: ableism
   sanity check: ableism
   dummy value: ableism
+  greybeard: gendered
+  graybeard: gendered
+  greybeards: gendered
+  graybeards: gendered
 
 # Default file excludes
 excludes:
