@@ -10,39 +10,6 @@ tasks:
 directories:
   scratch: /x1/scratch     # This is where all the git repos go - CHANGE IT TO SOMETHING USEFUL!
 
-# Default problematic words and terms
-words:
-  blacklist: race
-  whitelist: race
-  master: historical
-  slave: historical
-  blackhat: race
-  whitehat: race
-  grandfather: historical
-  grandfathered: historical
-  he: gendered
-  she: gendered
-  him: gendered
-  her: gendered
-  his: gendered
-  hers: gendered
-  man hours: gendered
-  insane: ableism
-  lame: ableism
-  sanity check: ableism
-  dummy value: ableism
-  greybeard: gendered
-  graybeard: gendered
-  greybeards: gendered
-  graybeards: gendered
-
-# Default file excludes
-excludes:
-  - "*.min.js"
-  - "*.min.css"
-  - "*.map"
-  - "*.svg"
-
 # Default program paths
 executables:
   git: "/usr/bin/git"

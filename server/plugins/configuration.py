@@ -29,13 +29,14 @@ class DirectoryConfig:
 
 
 class Configuration:
-    def __init__(self, yml: dict):
+    def __init__(self, yml: dict, dyml: dict):
         self.server: ServerConfig = ServerConfig(yml.get("server", {}))
         self.tasks: TaskConfig = TaskConfig(yml.get("tasks", {}))
         self.oauth: OAuthConfig = OAuthConfig(yml.get("oauth", {}))
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))
-        self.words = yml.get("words", [])
-        self.excludes = yml.get("excludes", [])
+        self.words = dyml.get("words", [])
+        self.excludes = dyml.get("excludes", [])
+        self.excludes_context = dyml.get("excludes_context", [])
         self.executables = yml.get("executables", {})
         assert "git" in self.executables and os.path.exists(self.executables["git"]), \
             "This service requires the git executable installed. If it is already installed, " \

@@ -45,7 +45,8 @@ class Server(plugins.basetypes.Server):
         print("==== CLC Suite v/%s starting... ====" % CLC_VERSION)
         # Load configuration
         yml = yaml.safe_load(open(args.config))
-        self.config = plugins.configuration.Configuration(yml)
+        dyml = yaml.safe_load(open(args.defaults))
+        self.config = plugins.configuration.Configuration(yml, dyml)
         self.data = plugins.configuration.InterData()
         self.handlers = dict()
         self.server = None
@@ -163,6 +164,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config", help="Configuration file to load (default: clc.yaml)", default="clc.yaml",
+
+    )
+    parser.add_argument(
+        "--defaults", help="Default settings file to load (default: defaults.yaml)", default="defaults.yaml",
     )
     cliargs = parser.parse_args()
     pubsub_server = Server(cliargs)
