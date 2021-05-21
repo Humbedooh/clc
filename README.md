@@ -5,11 +5,11 @@
 
 ## Installation
 
-- Clone the repo
-- go to the `server` dir and fix up `clc.yaml` to your liking
-- install `pipenv`: `apt install pipenv` or `yum install pipenv` etc
-- from the `server` dir, run: `pipenv install -r requirements.txt`
-- finally, to start the service, run: `pipenv run python3 main.py` and rejoice
+- Clone the repo: `git clone https://github.com/Humbedooh/clc.git`
+- Go to the `server/` dir and fix up `clc.yaml` to your liking
+- Install `pipenv`: `apt install pipenv` or `yum install pipenv` etc (older systems might use `pip3 install pipenv`)
+- From the `server/` dir, run: `pipenv install -r requirements.txt`
+- Finally, to start the service, run: `pipenv run python3 main.py` and see your service at http://localhost:8080 (default settings)
 
 ### Running as a Docker container
 
