@@ -20,13 +20,14 @@ import plugins.session
 import os
 import yaml
 import aiofiles
+import typing
 
 """ Quick Details API end point for CLC"""
 
 
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
     out = {}
-    project = indata.get("project")
+    project = indata.get("project", "foo")
     path = os.path.join(server.config.dirs.scratch, project)
     limit = int(indata.get("limit", 1000))
     if os.path.isdir(path):
@@ -39,7 +40,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             yml = yaml.safe_load(open(ymlfile))
             issues = ["Issues discovered"]
             processed = ["Files processed"]
-            duration = ["Scan duration"]
+            duration: typing.List[typing.Union[str, int]] = ["Scan duration"]
             x = ["x"]
             for scan in hyml[-50:]:
                 issues.append(scan["issues"])

@@ -25,7 +25,7 @@ import yaml
 
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
     if session and (session.credentials or True):
-        repo = indata.get("repo")
+        repo = indata.get("repo", '')
         assert ".." not in repo, "Invalid path specified"
         assert "~" not in repo, "Invalid path specified"
         excludes = indata.get("excludes")

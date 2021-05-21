@@ -19,6 +19,7 @@ import plugins.basetypes
 import plugins.session
 import os
 import yaml
+import typing
 
 """ Quick Stats API end point for CLC"""
 
@@ -43,7 +44,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             yml = yml[-50:]
             issues = ["Issues discovered"]
             processed = ["Files processed"]
-            duration = ["Scan duration"]
+            duration: typing.List[typing.Union[str, int]] = ["Scan duration"]
             x = ["x"]
             for scan in yml:
                 issues.append(scan["issues"])
