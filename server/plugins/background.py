@@ -13,7 +13,6 @@ import time
 import yaml
 import fnmatch
 
-GIT = "/usr/bin/git"
 re_word = re.compile(r"\b([a-z]+)\b")
 
 
@@ -35,6 +34,7 @@ class ProgTimer:
 
 async def scan_project(server, path):
     """Scans a project repo, looking for potential wording issues"""
+    git_exec = server.config.executables["git"]
     now = time.time()
     all_files = []
     yml = yaml.safe_load(open(os.path.join(path, "_clc.yaml")))
@@ -62,7 +62,7 @@ async def scan_project(server, path):
         "stash",
     )
     proc = await asyncio.create_subprocess_exec(
-        GIT, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await proc.communicate()
 
@@ -72,7 +72,7 @@ async def scan_project(server, path):
         "pull",
     )
     proc = await asyncio.create_subprocess_exec(
-        GIT, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
     stdout, stderr = await proc.communicate()
     if proc.returncode == 0:

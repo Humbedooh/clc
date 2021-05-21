@@ -38,3 +38,7 @@ excludes:
   - "*.min.css"
   - "*.map"
   - "*.svg"
+
+# Default program paths
+executables:
+  git: "/usr/bin/git"

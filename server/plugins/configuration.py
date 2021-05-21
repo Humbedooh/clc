@@ -36,6 +36,10 @@ class Configuration:
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))
         self.words = yml.get("words", [])
         self.excludes = yml.get("excludes", [])
+        self.executables = yml.get("executables", {})
+        assert "git" in self.executables and os.path.exists(self.executables["git"]), \
+            "This service requires the git executable installed. If it is already installed, " \
+            "please let me know where to find it in clc.yaml"
 
 
 class InterData:
