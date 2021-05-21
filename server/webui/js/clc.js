@@ -180,7 +180,16 @@ async function prime_intro() {
     let details = await GET('/api/stats.json');
     details = typeof(details) == 'object' ? details : {stats: details, activity: 'unknown...!'};
     let stats = details.stats;
+
     document.getElementById('activity').innerText = details.activity;
+    let m = details.activity.match(/(\d+)%/);
+    if (m) {
+        document.getElementById('progress').value = m[1];
+    } else {
+        document.getElementById('progress').style.display = "none";
+    }
+    document.getElementById('scanner_active').style.display = "inline";
+    document.getElementById('scanner_inactive').style.display = "none";
 
     let n = 0;
     let parent = document.getElementById('quickstats');
