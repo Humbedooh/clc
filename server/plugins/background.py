@@ -18,6 +18,7 @@ import fnmatch
 LOCK = threading.Lock()
 MERGE_ISSUES = False
 
+
 def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, bad_words_re, excludes_context):
     current_issues = []
     bad_words_stacked = {}
@@ -91,12 +92,11 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
     return current_issues, bad_words_stacked, f_p
 
 
-async def scan_project(server, path):
+async def scan_project(server, project, path):
     """Scans a project repo, looking for potential wording issues"""
     git_exec = server.config.executables["git"]
-    now = time.time()
     all_files = []
-    yml = yaml.safe_load(open(os.path.join(path, "_clc.yaml")))
+    yml = project.settings
     bad_words = server.config.words
     if "bad_words" in yml:
         bad_words = yml["bad_words"]
@@ -108,12 +108,8 @@ async def scan_project(server, path):
     if "excludes_context" in yml:
         excludes_context = yml["excludes_context"]
 
-    scan_history = []
-    history_file = os.path.join(path, "_clc_history.yaml")
-    if os.path.exists(history_file):
-        scan_history = yaml.safe_load(open(history_file))
+    scan_history = project.history
     server.data.activity = f"Preparing to scan {path}..."
-    git_dir = os.path.join(path, ".git")
 
     params = (
         "-C",
@@ -153,7 +149,6 @@ async def scan_project(server, path):
             bad_words_stacked[word] = 0
 
         # How many files and when did we start scanning
-        no_files = len(all_files)
         now = time.time()
 
         runners = plugins.offloader.ExecutorPool(threads=10)
@@ -209,13 +204,25 @@ async def scan_project(server, path):
                             if issue["resolution"] == "ignore":
                                 problems_found -= 1
 
+        # Save updated settings
+        project.settings = yml
         yaml.dump(yml, open(os.path.join(path, "_clc.yaml"), "w"))
-        # Writing issues could take AGES, so we offload to a thread
+
         server.data.activity = f"Writing report for last scan of {path}...could take a while."
+
+        # Save scan history
+        project.history = scan_history
+        history_file = os.path.join(path, "_clc_history.yaml")
         yaml.dump(scan_history, open(history_file, "w"))
+
+        # Writing issues could take AGES, so we offload to a thread
         print("Writing issue YAML...")
         current_issues = sorted(current_issues, key=lambda x: x["path"])
-        await runners.run(yaml.dump, current_issues, open(clc_issues_file, "w"))
+        clc_issues_file_tmp = clc_issues_file + ".tmp"
+        await runners.run(yaml.dump, current_issues, open(clc_issues_file_tmp, "w"))
+        os.unlink(clc_issues_file)
+        os.rename(clc_issues_file_tmp, clc_issues_file)
+
         print("Done, back to idling.")
     else:
         print(f"Could not pull in latest changes for {path}, ignoring for now...")
@@ -273,12 +280,36 @@ async def run_tasks(server: plugins.basetypes.Server):
 
         for repo in sorted(os.listdir(server.config.dirs.scratch)):
             path = os.path.join(server.config.dirs.scratch, repo)
-            yml = yaml.safe_load(open(os.path.join(path, "_clc.yaml")))
-            server.data.projects[repo] = yml
-            if "lastrun" in yml and yml["lastrun"] > time.time() - server.config.tasks.refresh_rate:
+            _clc_yaml_path = os.path.join(path, "_clc.yaml")
+            _clc_yaml_history_path = os.path.join(path, "_clc_history.yaml")
+            mtime = os.stat(_clc_yaml_path)
+            hmtime = os.stat(_clc_yaml_history_path)
+            reload_files = False
+            if repo not in server.data.projects:
+                server.data.projects[repo] = plugins.configuration.Project(repo)
+                reload_files = True
+            else:
+                if mtime and mtime.st_mtime != server.data.projects[repo].mtimes.get(_clc_yaml_path, 0):
+                    reload_files = True
+                if hmtime and hmtime.st_mtime != server.data.projects[repo].mtimes.get(_clc_yaml_history_path, 0):
+                    reload_files = True
+
+            if reload_files:
+                print(f"{_clc_yaml_path} changed on disk, reloading.")
+                if os.path.exists(_clc_yaml_path):
+                    yml = yaml.safe_load(open(_clc_yaml_path))
+                    server.data.projects[repo].settings = yml
+                    server.data.projects[repo].mtimes[_clc_yaml_path] = mtime.st_mtime
+                if os.path.exists(_clc_yaml_history_path):
+                    yml = yaml.safe_load(open(_clc_yaml_history_path))
+                    server.data.projects[repo].history = yml
+                    server.data.projects[repo].mtimes[_clc_yaml_history_path] = hmtime.st_mtime
+            if mtime:
+                yml = server.data.projects[repo].settings
+                if "lastrun" in yml and yml["lastrun"] > time.time() - server.config.tasks.refresh_rate:
+                    continue
+            else:
                 continue
-            await scan_project(server, path)
-            yml = yaml.safe_load(open(os.path.join(path, "_clc.yaml")))
-            server.data.projects[repo] = yml
+            await scan_project(server, server.data.projects[repo], path)
 
         await asyncio.sleep(5)
