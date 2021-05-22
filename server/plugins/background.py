@@ -212,11 +212,11 @@ async def scan_project(server, path):
         yaml.dump(yml, open(os.path.join(path, "_clc.yaml"), "w"))
         # Writing issues could take AGES, so we offload to a thread
         server.data.activity = f"Writing report for last scan of {path}...could take a while."
+        yaml.dump(scan_history, open(history_file, "w"))
         print("Writing issue YAML...")
         current_issues = sorted(current_issues, key=lambda x: x["path"])
         await runners.run(yaml.dump, current_issues, open(clc_issues_file, "w"))
         print("Done, back to idling.")
-        yaml.dump(scan_history, open(history_file, "w"))
     else:
         print(f"Could not pull in latest changes for {path}, ignoring for now...")
         print(stderr)
