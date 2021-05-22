@@ -155,7 +155,12 @@ async def scan_project(server, project, path):
         bad_words_stacked = {}
         bad_words_re = {}
         for word in bad_words:
-            bad_words_re[word] = re.compile(r"(?:\b|\W|_)+(" + word + r")(?:ed|ing|s)?(?:\b|\W|_)+", flags=re.UNICODE)
+            # If large word, find it anywhere
+            if len(word) > 5:
+                bad_words_re[word] = re.compile(r"(" + word + r")", flags=re.UNICODE)
+            # If smaller word, require boundaries but allow for endings
+            else:
+                bad_words_re[word] = re.compile(r"(?:\b|\W|_)+(" + word + r")(?:ed|ing|s)?(?:\b|\W|_)+", flags=re.UNICODE)
             bad_words_stacked[word] = 0
 
         # How many files and when did we start scanning
