@@ -20,7 +20,7 @@ try:
     dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
     from yaml import CLoader as loader, CDumper as dumper
     print("Using fast C++ YAML parser..!")
-except ImportError:
+except:
     from yaml import Loader as loader, Dumper as dumper
 
 LOCK = threading.Lock()

@@ -22,6 +22,8 @@ import yaml
 import aiofiles
 import typing
 try:
+    loader = typing.Union[yaml.Loader, yaml.CLoader]  # mypy fixups
+    dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
     from yaml import CLoader as loader, CDumper as dumper
     print("Using fast C++ YAML parser..!")
 except:
