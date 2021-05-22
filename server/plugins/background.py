@@ -14,10 +14,13 @@ import re
 import time
 import yaml
 import fnmatch
+import typing
 try:
+    loader = typing.Union[yaml.Loader, yaml.CLoader]  # mypy fixups
+    dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
     from yaml import CLoader as loader, CDumper as dumper
     print("Using fast C++ YAML parser..!")
-except:
+except ImportError:
     from yaml import Loader as loader, Dumper as dumper
 
 LOCK = threading.Lock()
@@ -26,7 +29,7 @@ MERGE_ISSUES = False
 
 def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, bad_words_re, excludes_context):
     current_issues = []
-    bad_words_stacked = {}
+    bad_words_stacked: dict = {}
     no_files = files.qsize()
     f_p = 0
     now = time.time()
@@ -319,11 +322,13 @@ async def run_tasks(server: plugins.basetypes.Server):
                 if os.path.exists(_clc_yaml_path):
                     yml = yaml.safe_load(open(_clc_yaml_path))
                     server.data.projects[repo].settings = yml
-                    server.data.projects[repo].mtimes[_clc_yaml_path] = mtime.st_mtime
+                    if mtime:
+                        server.data.projects[repo].mtimes[_clc_yaml_path] = mtime.st_mtime
                 if os.path.exists(_clc_yaml_history_path):
                     yml = yaml.safe_load(open(_clc_yaml_history_path))
                     server.data.projects[repo].history = yml
-                    server.data.projects[repo].mtimes[_clc_yaml_history_path] = hmtime.st_mtime
+                    if hmtime:
+                        server.data.projects[repo].mtimes[_clc_yaml_history_path] = hmtime.st_mtime
             if mtime:
                 yml = server.data.projects[repo].settings
                 if "lastrun" in yml and yml["lastrun"] > time.time() - server.config.tasks.refresh_rate:
