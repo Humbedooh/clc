@@ -53,8 +53,8 @@ class Server(plugins.basetypes.Server):
 
         # Pre-load all standard yamls (except issues!)
         for repo in os.listdir(self.config.dirs.scratch):
-            clcymlpath = os.path.join(self.config.dirs.scratch, repo, '_clc.yaml')
-            clchymlpath = os.path.join(self.config.dirs.scratch, repo, '_clc_history.yaml')
+            clcymlpath = os.path.join(self.config.dirs.scratch, repo, "_clc.yaml")
+            clchymlpath = os.path.join(self.config.dirs.scratch, repo, "_clc_history.yaml")
             project = plugins.configuration.Project(repo)
             if os.path.exists(clcymlpath):
                 print(f"Loading {clcymlpath} ...")
@@ -179,7 +179,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config", help="Configuration file to load (default: clc.yaml)", default="clc.yaml",
-
     )
     parser.add_argument(
         "--defaults", help="Default settings file to load (default: defaults.yaml)", default="defaults.yaml",
