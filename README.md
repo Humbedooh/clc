@@ -20,3 +20,8 @@ The simplest form is to use the provided `Dockerfile` as such:
 
 And visit http://localhost:8080/ for goodness!
 
+
+## Speeding up YAML parsing
+If you have a project with a lot of issues (10,000+), you can make use of the 
+C++ YAML parser in python by installing the `libyaml-cpp-dev` package before you 
+instapp PyYaml. This will speed up YAML parsing/writing by 10x.

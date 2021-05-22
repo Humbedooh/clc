@@ -21,6 +21,11 @@ import os
 import yaml
 import aiofiles
 import typing
+try:
+    from yaml import CLoader as loader, CDumper as dumper
+    print("Using fast C++ YAML parser..!")
+except:
+    from yaml import Loader as loader, Dumper as dumper
 
 """ Quick Details API end point for CLC"""
 
@@ -59,14 +64,18 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
         if os.path.exists(ymlfile):
             ymldata = ""
             entries = 0
-            async with aiofiles.open(ymlfile) as f:
-                async for line in f:
-                    if line.startswith("- "):
-                        entries += 1
-                        if entries > limit:
-                            break
-                    ymldata += line
-            yml = yaml.safe_load(ymldata)
+            if limit < 2500:  # Slow async load if few lines requested
+                async with aiofiles.open(ymlfile) as f:
+                    async for line in f:
+                        if line.startswith("- "):
+                            entries += 1
+                            if entries > limit:
+                                break
+                        ymldata += line
+            else:  # If more requested, load everything at once
+                ymldata = open(ymlfile).read()
+            print("Parsing yaml..")
+            yml = yaml.load(ymldata, Loader=loader)
             yml = yml[:limit]
             for issue in yml:
                 issue["path"] = issue["path"].replace(path, "", 1)

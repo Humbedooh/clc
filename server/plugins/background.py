@@ -14,6 +14,11 @@ import re
 import time
 import yaml
 import fnmatch
+try:
+    from yaml import CLoader as loader, CDumper as dumper
+    print("Using fast C++ YAML parser..!")
+except:
+    from yaml import Loader as loader, Dumper as dumper
 
 LOCK = threading.Lock()
 MERGE_ISSUES = False
@@ -222,7 +227,7 @@ async def scan_project(server, project, path):
         print("Writing issue YAML...")
         current_issues = sorted(current_issues, key=lambda x: x["path"])
         clc_issues_file_tmp = clc_issues_file + ".tmp"
-        await runners.run(yaml.dump, current_issues, open(clc_issues_file_tmp, "w"))
+        await runners.run(yaml.dump, current_issues, open(clc_issues_file_tmp, "w"), Dumper=dumper)
         if os.path.exists(clc_issues_file):
             os.unlink(clc_issues_file)
         os.rename(clc_issues_file_tmp, clc_issues_file)
