@@ -53,6 +53,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             yml["excludes"] = excludes
             yml["excludes_context"] = excludes_context
             yaml.dump(yml, open(ymlfile, "w"))
+            server.data.projects[repo].mtimes[ymlfile] = os.stat(ymlfile).st_mtime
             return {
                 "okay": True,
                 "message": "Settings saved. Please wait for next scan for it to apply.",
