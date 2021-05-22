@@ -206,7 +206,9 @@ async def scan_project(server, project, path):
 
         # Save updated settings
         project.settings = yml
-        yaml.dump(yml, open(os.path.join(path, "_clc.yaml"), "w"))
+        ymlpath = os.path.join(path, "_clc.yaml")
+        yaml.dump(yml, open(ymlpath, "w"))
+        project.mtimes[ymlpath] = os.stat(ymlpath).st_mtime
 
         server.data.activity = f"Writing report for last scan of {path}...could take a while."
 
@@ -214,6 +216,7 @@ async def scan_project(server, project, path):
         project.history = scan_history
         history_file = os.path.join(path, "_clc_history.yaml")
         yaml.dump(scan_history, open(history_file, "w"))
+        project.mtimes[history_file] = os.stat(history_file).st_mtime
 
         # Writing issues could take AGES, so we offload to a thread
         print("Writing issue YAML...")
