@@ -31,6 +31,7 @@ class DirectoryConfig:
 class Project:
     def __init__(self, path):
         self.repo = path.split("/")[-1]
+        self.mtimes = {}
         self.settings = {}
         self.history = {}
         self.issues = []
