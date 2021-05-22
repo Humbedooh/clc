@@ -54,6 +54,26 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                 processed.append(scan["files_processed"])
                 duration.append(int(scan["duration"]))
                 x.append(scan["epoch"])
+
+            x_breakdown = ["x"]
+            x_words = {}
+            for scan in hyml[-50:]:
+                br = scan.get('words_stacked')
+                if br:
+                    for word in br:
+                        x_words[word] = []
+            for scan in hyml[-50:]:
+                br = scan.get('words_stacked')
+                if br:
+                    x_breakdown.append(scan["epoch"])
+                    for word in x_words:
+                        x_words[word].append(br.get(word, 0))
+            breakdown_chart = [x_breakdown]
+            for word in x_words:
+                li = [word]
+                li.extend(x_words[word])
+                breakdown_chart.append(li)
+
             yml["bad_words"] = yml.get("bad_words", server.config.words)
             yml["excludes"] = yml.get("excludes", server.config.excludes)
             out["details"] = yml
@@ -61,6 +81,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             out["reasons"] = server.config.contexts
             out["chart"] = [x, processed, issues, duration]
             out["breakdown"] = yml['status'].get('words_stacked')
+            out['breakdown_timeline'] = breakdown_chart
         ymlfile = os.path.join(path, "_clc_issues.yaml")
         issues_stacked = {}
         if os.path.exists(ymlfile):

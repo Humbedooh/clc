@@ -64,6 +64,14 @@
   <div class="grid-x grid-margin-x medium-up-3 large-up-4">
     <div class="cell" style="width: 740px;" id="quickstats"></div>
     <div class="cell" style="width: 400px;" id="quickstats_breakdown"></div>
+
+    <div class="cell" style="width: 740px;">
+    <p style="text-align: center;"><small>
+    <a href="#" onclick="quickstats('breakdown_timeline', 'stacked');">Break down into words</a> &nbsp; | &nbsp; 
+    <a href="#" onclick="quickstats('chart', 'bar');">Combine words</a>
+    </small>
+    </p>
+    </div>
   </div>
   <a href="javascript:void(show_repo_settings());">Scan settings...</a>
   <div id="settings_parent" style="display: none; border: 1px dotted #333; background: #FFD; padding: 4px;">

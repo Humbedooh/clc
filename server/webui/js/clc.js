@@ -1,6 +1,6 @@
 let repository = null;
 let reasons = {};
-
+let json = null;
 
 async function POST(url = '', data = {}) {
     const response = await fetch(url, {
@@ -278,29 +278,20 @@ async function prime_intro() {
 }
 
 
-
-
-async function prime_analysis(limit) {
-    document.getElementById('spinner').style.display = 'block';
-    document.getElementById('stats').style.display = 'none';
-    limit = limit ? limit : 500
-    let stats = await GET('/api/details.json' + location.search + "&limit=" + limit);
-    document.getElementById('spinner').style.display = 'none';
-    document.getElementById('stats').style.display = 'block';
-
-
-    let n = 0;
-    let parent = document.getElementById('quickstats');
-
-    let no_files = 0;
-    let no_issues = 0;
-    let no_handled = 0;
-    repository = stats.repo;
-    reasons = stats.reasons;
-
-    for (let z = 1; z < stats.chart[0].length; z++) {
-        stats.chart[0][z] = new Date(stats.chart[0][z]*1000.0);
+function quickstats(source, ty) {
+    let groupings = [];
+    if (ty == 'stacked') {
+        for (let i = 1; i < json[source].length; i++) {
+            groupings.push(json[source][i][0]);
+        }
     }
+
+    for (let z = 1; z < json[source][0].length; z++) {
+        if (typeof(json[source][0][z]) == 'number') {
+            json[source][0][z] = new Date(json[source][0][z] * 1000.0);
+        }
+    }
+
     c3.generate({
         bindto: document.getElementById('quickstats'),
         title: {
@@ -339,14 +330,14 @@ async function prime_analysis(limit) {
         },
         data: {
             x: 'x',
-            columns: stats.chart,
+            columns: json[source],
             type: 'bar',
             types: {
                 'Files processed': 'line',
                 'Scan duration': 'line',
             },
             groups: [
-                ['data1','data2']
+                groupings
             ],
             axes: {
                 'Scan duration': 'y2',
@@ -359,6 +350,28 @@ async function prime_analysis(limit) {
             }
         }
     });
+}
+
+
+async function prime_analysis(limit) {
+    document.getElementById('spinner').style.display = 'block';
+    document.getElementById('stats').style.display = 'none';
+    limit = limit ? limit : 500
+    let stats = await GET('/api/details.json' + location.search + "&limit=" + limit);
+    json = stats;
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('stats').style.display = 'block';
+
+
+    let n = 0;
+    let parent = document.getElementById('quickstats');
+
+    let no_files = 0;
+    let no_issues = 0;
+    let no_handled = 0;
+    repository = stats.repo;
+    reasons = stats.reasons;
+    quickstats('chart');
 
     c3.generate({
         bindto: document.getElementById('quickstats_breakdown'),
