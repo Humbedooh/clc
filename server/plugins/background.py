@@ -15,10 +15,12 @@ import time
 import yaml
 import fnmatch
 import typing
+
 try:
     loader = typing.Union[yaml.Loader, yaml.CLoader]  # mypy fixups
     dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
     from yaml import CLoader as loader, CDumper as dumper
+
     print("Using fast C++ YAML parser..!")
 except:
     from yaml import Loader as loader, Dumper as dumper
@@ -52,8 +54,8 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
         if os.path.islink(file):
             continue  # no symlinks, please
         if any(
-                fnmatch.fnmatch(file, foo) or fnmatch.fnmatch(file.replace(path, "", 1).lstrip("/"), foo)
-                for foo in excludes
+            fnmatch.fnmatch(file, foo) or fnmatch.fnmatch(file.replace(path, "", 1).lstrip("/"), foo)
+            for foo in excludes
         ):
             continue  # don't match excludes
         try:
@@ -73,10 +75,7 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
                                 ctx_start = max(0, word.start(1) - 64)
                                 ctx_end = min(len(line), word.end(1) + 64)
                                 try:
-                                    if any(
-                                            ctx and re.search(ctx, line_lowercase)
-                                            for ctx in excludes_context
-                                    ):
+                                    if any(ctx and re.search(ctx, line_lowercase) for ctx in excludes_context):
                                         continue
                                 except SyntaxError:  # Bad regex
                                     pass
@@ -170,7 +169,21 @@ async def scan_project(server, project, path):
             all_files_thrd.put_nowait(file)
 
         for i in range(0, 4):
-            awaits.append(asyncio.create_task(runners.run(process_files, i, server, all_files_thrd, path, excludes, bad_words, bad_words_re, excludes_context)))
+            awaits.append(
+                asyncio.create_task(
+                    runners.run(
+                        process_files,
+                        i,
+                        server,
+                        all_files_thrd,
+                        path,
+                        excludes,
+                        bad_words,
+                        bad_words_re,
+                        excludes_context,
+                    )
+                )
+            )
 
         for x in awaits:
             problems_tmp, bad_words_tmp, f_p = await x
