@@ -74,7 +74,6 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                         ymldata += line
             else:  # If more requested, load everything at once
                 ymldata = open(ymlfile).read()
-            print("Parsing yaml..")
             yml = yaml.load(ymldata, Loader=loader)
             yml = yml[:limit]
             for issue in yml:
