@@ -51,6 +51,21 @@ class Server(plugins.basetypes.Server):
         self.handlers = dict()
         self.server = None
 
+        # Pre-load all standard yamls (except issues!)
+        for repo in os.listdir(self.config.dirs.scratch):
+            clcymlpath = os.path.join(self.config.dirs.scratch, repo, '_clc.yaml')
+            clchymlpath = os.path.join(self.config.dirs.scratch, repo, '_clc_history.yaml')
+            project = plugins.configuration.Project(repo)
+            if os.path.exists(clcymlpath):
+                print(f"Loading {clcymlpath} ...")
+                project.settings = yaml.safe_load(open(clcymlpath))
+                project.mtimes[clcymlpath] = os.stat(clcymlpath).st_mtime
+                if os.path.exists(clchymlpath):
+                    print(f"Loading {clchymlpath} ...")
+                    project.history = yaml.safe_load(open(clchymlpath))
+                    project.mtimes[clchymlpath] = os.stat(clchymlpath).st_mtime
+                self.data.projects[repo] = project
+
         # Load each URL endpoint
         for endpoint_file in os.listdir("endpoints"):
             if endpoint_file.endswith(".py"):
