@@ -1,4 +1,4 @@
-PyYAML~=5.1.2
+PyYAML~=5.4.1
 netaddr~=0.8.0
 asyncio~=3.4.3
 aiohttp~=3.6.2
