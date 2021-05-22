@@ -33,7 +33,7 @@ class Project:
         self.repo = path.split("/")[-1]
         self.mtimes = {}
         self.settings = {}
-        self.history = {}
+        self.history = []
         self.issues = []
         self.issues_per_file = {}
 
