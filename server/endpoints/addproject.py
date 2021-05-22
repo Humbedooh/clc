@@ -22,7 +22,7 @@ import plugins.session
 
 
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
-    if session and (session.credentials or True):
+    if session and (session.credentials or server.config.debug.open_server):
         repo_url = indata.get("url")
         words = indata.get("words", server.config.words)
         excludes = indata.get("excludes", server.config.excludes)

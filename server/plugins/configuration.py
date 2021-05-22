@@ -30,7 +30,7 @@ class DirectoryConfig:
 class DebugConfig:
     def __init__(self, subyaml: dict):
         self.print_issues = subyaml.get('print_issues', True)
-
+        self.open_server = subyaml.get('open_server', False)
 
 class Project:
     def __init__(self, path):
