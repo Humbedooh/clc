@@ -223,7 +223,8 @@ async def scan_project(server, project, path):
         current_issues = sorted(current_issues, key=lambda x: x["path"])
         clc_issues_file_tmp = clc_issues_file + ".tmp"
         await runners.run(yaml.dump, current_issues, open(clc_issues_file_tmp, "w"))
-        os.unlink(clc_issues_file)
+        if os.path.exists(clc_issues_file):
+            os.unlink(clc_issues_file)
         os.rename(clc_issues_file_tmp, clc_issues_file)
 
         print("Done, back to idling.")
@@ -285,8 +286,13 @@ async def run_tasks(server: plugins.basetypes.Server):
             path = os.path.join(server.config.dirs.scratch, repo)
             _clc_yaml_path = os.path.join(path, "_clc.yaml")
             _clc_yaml_history_path = os.path.join(path, "_clc_history.yaml")
-            mtime = os.stat(_clc_yaml_path)
-            hmtime = os.stat(_clc_yaml_history_path)
+            mtime = None
+            if os.path.exists(_clc_yaml_path):
+                mtime = os.stat(_clc_yaml_path)
+            hmtime = None
+            if os.path.exists(_clc_yaml_history_path):
+                hmtime = os.stat(_clc_yaml_history_path)
+
             reload_files = False
             if repo not in server.data.projects:
                 server.data.projects[repo] = plugins.configuration.Project(repo)
