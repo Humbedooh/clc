@@ -28,25 +28,21 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
     out = {}
     repos = []
     for repo in os.listdir(server.config.dirs.scratch):
-        path = os.path.join(server.config.dirs.scratch, repo)
-        ymlfile = os.path.join(path, "_clc.yaml")
-        if os.path.exists(ymlfile):
-            yml = yaml.safe_load(open(ymlfile))
-            repos.append((repo, yml.get("lastrun", 0)))
+        if repo in server.data.projects:
+            repos.append((repo, server.data.projects[repo].settings.get("lastrun", 0)))
 
     repos = [x[0] for x in sorted(repos, key=lambda x: x[1], reverse=True)]
 
     for repo in repos:
         path = os.path.join(server.config.dirs.scratch, repo)
-        ymlfile = os.path.join(path, "_clc_history.yaml")
-        if os.path.exists(ymlfile):
-            yml = yaml.safe_load(open(ymlfile))
-            yml = yml[-50:]
+        history = server.data.projects[repo].history
+        if history:
+            history = history[-50:]
             issues = ["Issues discovered"]
             processed = ["Files processed"]
             duration: typing.List[typing.Union[str, int]] = ["Scan duration"]
             x = ["x"]
-            for scan in yml:
+            for scan in history:
                 issues.append(scan["issues"])
                 processed.append(scan["files_processed"])
                 duration.append(int(scan["duration"]))
