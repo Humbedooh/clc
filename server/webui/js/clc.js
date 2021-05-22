@@ -223,7 +223,7 @@ async function prime_intro() {
                 x: {
                     type: 'timeseries',
                     tick: {
-                        count: 7,
+                        count: 5,
                         format: '%Y-%m-%d'
                     },
                     label: {
@@ -309,7 +309,7 @@ function quickstats(source, ty) {
                 },
                 type: 'timeseries',
                 tick: {
-                    count: 7,
+                    count: 5,
                     format: '%Y-%m-%d'
                 }
             },
