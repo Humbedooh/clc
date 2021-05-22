@@ -28,7 +28,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
         excludes = indata.get("excludes", server.config.excludes)
         excludes_context = indata.get("excludes_context", [])
         branch = indata.get("branch")
-        in_db = any([project["source"] == repo_url for project in server.data.projects.values()])
+        in_db = any([project.settings["source"] == repo_url for project in server.data.projects.values()])
         if repo_url and not in_db and not any(project["url"] == repo_url for project in server.data.project_queue):
             server.data.project_queue.append(
                 {
