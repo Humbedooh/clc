@@ -100,6 +100,8 @@ def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, ba
 
 async def scan_project(server, project, path):
     """Scans a project repo, looking for potential wording issues"""
+    if server.config.debug.print_issues:
+        print(f"Starting scheduled scan of {path}...")
     git_exec = server.config.executables["git"]
     all_files = []
     yml = project.settings
@@ -178,9 +180,10 @@ async def scan_project(server, project, path):
                     bad_words_stacked[k] += v
 
         taken = time.time() - now
-        print(
-            f"Processed {path} in {int(taken)} seconds, found {problems_found} potential issues in {files_processed} text files."
-        )
+        if server.config.debug.print_issues:
+            print(
+                f"Processed {path} in {int(taken)} seconds, found {problems_found} potential issues in {files_processed} text files."
+            )
         yml["lastrun"] = int(time.time())
         yml["scans"] += 1
         yml["status"] = {
@@ -225,7 +228,8 @@ async def scan_project(server, project, path):
         project.mtimes[history_file] = os.stat(history_file).st_mtime
 
         # Writing issues could take AGES, so we offload to a thread
-        print("Writing issue YAML...")
+        if server.config.debug.print_issues:
+            print("Writing issue YAML...")
         current_issues = sorted(current_issues, key=lambda x: x["path"])
         clc_issues_file_tmp = clc_issues_file + ".tmp"
         await runners.run(yaml.dump, current_issues, open(clc_issues_file_tmp, "w"), Dumper=dumper)
@@ -233,7 +237,8 @@ async def scan_project(server, project, path):
             os.unlink(clc_issues_file)
         os.rename(clc_issues_file_tmp, clc_issues_file)
 
-        print("Done, back to idling.")
+        if server.config.debug.print_issues:
+            print("Done, back to idling.")
     else:
         print(f"Could not pull in latest changes for {path}, ignoring for now...")
         print(stderr)
