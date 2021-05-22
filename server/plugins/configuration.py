@@ -28,6 +28,15 @@ class DirectoryConfig:
         assert os.path.isdir(self.scratch), f"Scratch dir {self.scratch} could not be found, please create it or change clc.yaml!"
 
 
+class Project:
+    def __init__(self, path):
+        self.repo = path.split("/")[-1]
+        self.settings = {}
+        self.history = {}
+        self.issues = []
+        self.issues_per_file = {}
+
+
 class Configuration:
     def __init__(self, yml: dict, dyml: dict):
         self.server: ServerConfig = ServerConfig(yml.get("server", {}))
@@ -56,3 +65,4 @@ class InterData:
         self.projects: dict = {}
         self.project_queue: list = []
         self.activity: str = "Idling..."
+

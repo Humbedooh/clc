@@ -265,7 +265,9 @@ async def run_tasks(server: plugins.basetypes.Server):
                 }
                 with open(os.path.join(destination, "_clc.yaml"), "w") as f:
                     yaml.dump(yml, f)
-                    server.data.projects[reponame] = yml
+                    project = plugins.configuration.Project(reponame)
+                    project.settings = yml
+                    server.data.projects[reponame] = project
             print("Done!")
             server.data.activity = "Idling..."
 
