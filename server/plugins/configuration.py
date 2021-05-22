@@ -27,6 +27,10 @@ class DirectoryConfig:
         self.scratch = subyaml.get("scratch", "scratch")
         assert os.path.isdir(self.scratch), f"Scratch dir {self.scratch} could not be found, please create it or change clc.yaml!"
 
+class DebugConfig:
+    def __init__(self, subyaml: dict):
+        self.print_issues = subyaml.get('print_issues', True)
+
 
 class Project:
     def __init__(self, path):
@@ -44,6 +48,7 @@ class Configuration:
         self.tasks: TaskConfig = TaskConfig(yml.get("tasks", {}))
         self.oauth: OAuthConfig = OAuthConfig(yml.get("oauth", {}))
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))
+        self.debug: DebugConfig = DebugConfig(yml.get("debug", {}))
         self.words = dyml.get("words", [])
         self.excludes = dyml.get("excludes", [])
         self.excludes_context = dyml.get("excludes_context", [])

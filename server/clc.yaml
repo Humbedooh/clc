@@ -13,3 +13,8 @@ directories:
 # Default program paths
 executables:
   git: "/usr/bin/git"
+
+# CLI output settings
+debug:
+  print_issues: true  # Set to false to suppress all bad word findings in your CLI output
+
