@@ -26,11 +26,8 @@ import yaml
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
     out = {}
     for repo in sorted(os.listdir(server.config.dirs.scratch)):
-        path = os.path.join(server.config.dirs.scratch, repo)
-        ymlfile = os.path.join(path, "_clc.yaml")
-        if os.path.exists(ymlfile):
-            yml = yaml.safe_load(open(ymlfile))
-            out[repo] = yml
+        if repo in server.data.projects:
+            out[repo] = server.data.projects[repo].settings
     return out
 
 
