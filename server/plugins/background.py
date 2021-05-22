@@ -229,7 +229,7 @@ async def run_tasks(server: plugins.basetypes.Server):
 
         Generally runs every 2½ minutes, or whatever is set in tasks/refresh_rate in boxer.yaml
     """
-
+    git_exec = server.config.executables["git"]
     await asyncio.sleep(3)
     while True:
         #  print("Running background tasks...")
@@ -248,7 +248,7 @@ async def run_tasks(server: plugins.basetypes.Server):
             print(f"Checking out {url} ({branch}) into {destination}")
             server.data.activity = f"Cloning repository into {destination}..."
             proc = await asyncio.create_subprocess_exec(
-                GIT, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+                git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
             )
             stdout, stderr = await proc.communicate()
             if proc.returncode == 0:
