@@ -360,7 +360,10 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         },
         xAxis: {
             type: 'category',
-            data: x_axis
+            data: x_axis,
+            axisLabel: {
+                formatter: (d) => new Date(d).toDateString()
+            }
         },
         yAxis: [{
                 type: 'value',
