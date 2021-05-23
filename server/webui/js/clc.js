@@ -337,7 +337,7 @@ function radar_breakdown(stats, ctitle) {
             axisPointer: {            // Use axis to trigger tooltip
                 type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
             },
-            formatter: sort_radar
+            formatter: unlog_radar
         },
         title: {
             text: ctitle? ctitle : "Current word breakdown",
@@ -364,11 +364,13 @@ function radar_breakdown(stats, ctitle) {
 }
 
 
-function sort_radar(params) {
+// Turns those log2 entries back into real numbers
+function unlog_radar(params) {
     let i = 0;
     let html = "";
     for (let reason in reasons) {
         let val = 0;
+        // log2(0) == -infinity
         if (!isNaN(params.value[i])) {
             val = Math.round(Math.pow(2, params.value[i]));
         }
