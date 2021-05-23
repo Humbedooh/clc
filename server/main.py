@@ -90,7 +90,7 @@ class Server(plugins.basetypes.Server):
         # We are backwards compatible with the old Lua interface URLs
         body_type = "form"
         uri = request.path
-        file_path = os.path.join(".", "webui", uri[1:])
+        file_path = os.path.join(".", "webui", uri[1:].replace('..', ''))
         if file_path.endswith("/"):
             file_path += "index.html"
         is_api = False
