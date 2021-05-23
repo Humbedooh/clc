@@ -33,3 +33,7 @@ excludes:
   - "*.min.css"
   - "*.map"
   - "*.svg"
+
+# Word contexts to exclude from scans
+exclude_contexts:
+  - webmaster
