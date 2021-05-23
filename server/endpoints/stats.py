@@ -39,8 +39,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
         if history:
             history = history[-20:]
             issues = ["Issues discovered"]
-            processed = ["Files processed"]
-            x = ["x"]
+            x: typing.List[typing.Union[str, list]] = ["x"]
             for scan in history:
                 issues.append(scan["issues"])
                 x.append([scan["epoch"], scan["files_processed"]])

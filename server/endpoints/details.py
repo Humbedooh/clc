@@ -55,8 +55,8 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                 duration.append(int(scan["duration"]))
                 x.append(scan["epoch"])
 
-            x_breakdown = ["x"]
-            x_words = {}
+            x_breakdown: typing.List[typing.Union[str, list]]  = ["x"]
+            x_words: dict = {}
             for scan in hyml[-50:]:
                 br = scan.get('words_stacked')
                 if br:
