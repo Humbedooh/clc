@@ -313,6 +313,10 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         data: files_processed,
         yAxisIndex: 1
     })
+    let toppx = '32px';
+    if (legend) {
+        toppx = items.length > 5 ? '80px' : '60px';
+    }
 
     chartDom = chartDom ? chartDom : document.getElementById('quickstats');
     let myChart = echarts.init(chartDom);
@@ -331,7 +335,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
             left: '3%',
             right: '4%',
             bottom: '3%',
-            top: '80px',
+            top: toppx,
             containLabel: true
         },
         xAxis: {
