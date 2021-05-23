@@ -106,10 +106,22 @@ function show_repo_settings() {
 
 
 let projects_json = null;
+let defaults_json = null;
 let sort_order = -1;
 
 
 async function prime_projects_list(sortkey=0) {
+    let defaults = defaults_json ? defaults_json : await GET('/api/defaults.json');
+    defaults_json = defaults;
+
+    document.getElementById('excludes').textContent = defaults.excludes.join("\n");
+    document.getElementById('excludes_context').textContent = defaults.excludes_context.join("\n");
+    let bad_words = [];
+    for (let k in defaults.words||{}) {
+        bad_words.push(`${k}: ${defaults.words[k]}`);
+    }
+    document.getElementById('words').textContent = bad_words.join("\n");
+
     let stats = projects_json ? projects_json : await GET('/api/all.json');
     projects_json = stats;
 
