@@ -243,15 +243,6 @@ function donut_breakdown() {
                 type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
             }
         },
-        legend: {
-            data: words
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
         series: {
             name: 'Word breakdown',
             type: 'pie',
@@ -262,19 +253,12 @@ function donut_breakdown() {
                 borderColor: '#fff',
                 borderWidth: 1
             },
-            label: {
-                show: false,
-                position: 'center'
-            },
             emphasis: {
                 label: {
                     show: true,
                     fontSize: '20',
                     fontWeight: 'bold'
                 }
-            },
-            labelLine: {
-                show: false
             },
             data: items
         }
