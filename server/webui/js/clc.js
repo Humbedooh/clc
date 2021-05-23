@@ -311,7 +311,7 @@ function radar_breakdown(stats, ctitle) {
                 xval += val;
             }
         }
-        xval = Math.log10(xval);
+        xval = Math.log2(xval);
         categories.push({name: reason, max: max});
         items.push(xval);
         if (xval > max) max = xval;
@@ -364,7 +364,7 @@ function sort_radar(params) {
     for (let reason in reasons) {
         let val = 0;
         if (!isNaN(params.value[i])) {
-            val = Math.round(Math.pow(10, params.value[i]));
+            val = Math.round(Math.pow(2, params.value[i]));
         }
         html += `<b>${reason}: </b> ${val}<br/>`;
         i++;
