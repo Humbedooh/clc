@@ -244,6 +244,10 @@ function donut_breakdown() {
                 type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
             }
         },
+        title: {
+            text: "Current word breakdown",
+            left: 'center'
+        },
         series: {
             name: 'Word breakdown',
             type: 'pie',
@@ -320,7 +324,8 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
             }
         },
         title: {
-            text: ctitle
+            text: ctitle,
+            left: 'center'
         },
         grid: {
             left: '3%',
