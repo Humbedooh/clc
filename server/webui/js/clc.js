@@ -219,6 +219,9 @@ async function prime_intro() {
                 height: 220,
                 width: 600
             },
+            bar: {
+                width: 0.8 * (500/stats[repo][0].length-1)
+            },
             axis: {
                 x: {
                     type: 'timeseries',
@@ -300,6 +303,9 @@ function quickstats(source, ty) {
         size: {
             height: 320,
             width: 720
+        },
+        bar: {
+            width: 0.8 * (660/json[source][0].length-1)
         },
         axis: {
             x: {
