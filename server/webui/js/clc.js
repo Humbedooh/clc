@@ -222,7 +222,7 @@ async function prime_intro() {
 
 function donut_breakdown() {
     let chartDom = document.getElementById('quickstats_donut');
-    chartDom.style.width = "280px";
+    chartDom.style.width = "340px";
     chartDom.style.height = "250px";
     let myChart = echarts.init(chartDom);
     let items = [];
@@ -269,14 +269,6 @@ function donut_breakdown() {
                 }
             },
             data: items
-        },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {show: true},
-                dataView: {show: true, readOnly: false},
-                saveAsImage: {show: true},
-            }
         }
     };
     myChart.setOption(options);
@@ -285,7 +277,7 @@ function donut_breakdown() {
 
 function radar_breakdown(stats, ctitle) {
     let chartDom = document.getElementById('quickstats_radar');
-    chartDom.style.width = "240px";
+    chartDom.style.width = "340px";
     chartDom.style.height = "250px";
     let myChart = echarts.init(chartDom);
     let categories = [];
@@ -340,15 +332,7 @@ function radar_breakdown(stats, ctitle) {
                     name: json.repo
                 }
             ]
-        }],
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {show: true},
-                dataView: {show: true, readOnly: false},
-                saveAsImage: {show: true},
-            }
-        }
+        }]
     };
     myChart.setOption(options);
 }
