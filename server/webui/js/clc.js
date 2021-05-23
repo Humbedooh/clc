@@ -269,6 +269,14 @@ function donut_breakdown() {
                 }
             },
             data: items
+        },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                saveAsImage: {show: true},
+            }
         }
     };
     myChart.setOption(options);
@@ -316,7 +324,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
     let toppx = '32px';
     if (ctitle) toppx = '56px';
     if (legend) {
-        toppx = items.length > 5 ? '80px' : '60px';
+        toppx = items.length > 5 ? '80px' : '68px';
     }
 
     chartDom = chartDom ? chartDom : document.getElementById('quickstats');
@@ -340,6 +348,16 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
             top: toppx,
             containLabel: true
         },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                restore: {show: true},
+                saveAsImage: {show: true},
+                magicType: {show: true, type: ['line', 'bar']}
+            }
+        },
         xAxis: {
             type: 'category',
             data: x_axis
@@ -356,7 +374,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         ,
         series: series
     };
-    if (legend) options.legend= {data: items};
+    if (legend) options.legend= {width: '75%', data: items};
     myChart.setOption(options);
 }
 
