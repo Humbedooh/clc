@@ -374,7 +374,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         ,
         series: series
     };
-    if (legend) options.legend= {width: '75%', data: items};
+    if (legend) options.legend= {width: '75%', left: 'left', data: items};
     myChart.setOption(options);
 }
 
