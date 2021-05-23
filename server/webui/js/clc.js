@@ -192,87 +192,26 @@ async function prime_intro() {
     let no_files = 0;
     let no_issues = 0;
     let no_projects = 0;
+    json = {};
 
     for (let repo in stats) {
         n++;
         no_projects++;
-        if (typeof(stats[repo][2][stats[repo][2].length-1]) == 'number') {
-            no_issues += stats[repo][2][stats[repo][2].length-1];
-            no_files += stats[repo][1][stats[repo][1].length-1];
+        if (typeof(stats[repo][1][stats[repo][1].length-1]) == 'number') {
+            no_issues += stats[repo][1][stats[repo][1].length-1];
+            no_files += stats[repo][0][stats[repo][0].length-1][1];
         }
-        if (n > 6) continue
+        if (n > 9) continue
         let a = document.createElement('a');
         a.setAttribute('href', `analysis.html?project=${repo}`);
         let div = document.createElement('div');
         a.appendChild(div);
         div.setAttribute('id', `_quickstats_${repo}`);
+        div.style.width = "400px";
+        div.style.height = "180px";
         parent.appendChild(a);
-        for (let z = 1; z < stats[repo][0].length; z++) {
-            stats[repo][0][z] = new Date(stats[repo][0][z]*1000.0);
-        }
-        c3.generate({
-            bindto: div,
-            title: {
-                text: repo
-            },
-            size: {
-                height: 220,
-                width: 600
-            },
-            bar: {
-                width: 0.8 * (500/stats[repo][0].length-1)
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        count: 5,
-                        format: '%Y-%m-%d'
-                    },
-                    label: {
-                        text: "Time",
-                        position: "outer-middle"
-                    }
-                },
-                y: {
-                    label: {
-                        text: "Issues found",
-                        position: "outer-middle"
-                    },
-                    show: true
-                },
-                y2: {
-                    label: {
-                        text: "Files processed",
-                        position: "outer-middle"
-                    },
-                    show: true
-                }
-            },
-
-
-            data: {
-                x: 'x',
-                columns: stats[repo],
-                type: 'bar',
-                types: {
-                    'Files processed': 'line',
-                    'Scan duration': 'line',
-                },
-                groups: [
-                    ['data1','data2']
-                ],
-                axes: {
-                    'Scan duration': 'y2',
-                    'Files processed': 'y2'
-                },
-                colors: {
-                    'Issues discovered': '#1686d2',
-                    'Files processed': '#1cd216',
-                    'Scan duration': '#d24b16'
-                }
-            }
-        });
+        json['breakdown_' + repo] = stats[repo];
+        stacked_breakdown('breakdown_' + repo, div, repo, false);
 
     }
     document.getElementById('quickstats_projects').innerText = no_projects.pretty();
@@ -281,81 +220,144 @@ async function prime_intro() {
 }
 
 
-function quickstats(source, ty) {
-    let groupings = [];
-    if (ty == 'stacked') {
-        for (let i = 1; i < json[source].length; i++) {
-            groupings.push(json[source][i][0]);
-        }
+function donut_breakdown() {
+    let chartDom = document.getElementById('quickstats_donut');
+    chartDom.style.width = "300px";
+    chartDom.style.height = "300px";
+    let myChart = echarts.init(chartDom);
+    let items = [];
+    let words = [];
+    for (let z= 0; z < json.breakdown.length; z++) {
+        let word = json.breakdown[z][0];
+        let val = json.breakdown[z][1];
+        words.push(word);
+        items.push({
+            name: word,
+            value: val
+        });
     }
-
-    for (let z = 1; z < json[source][0].length; z++) {
-        if (typeof(json[source][0][z]) == 'number') {
-            json[source][0][z] = new Date(json[source][0][z] * 1000.0);
-        }
-    }
-
-    c3.generate({
-        bindto: document.getElementById('quickstats'),
-        title: {
-            text: "Issues over time"
+    let options = {
+        tooltip: {
+            trigger: 'item',
+            axisPointer: {            // Use axis to trigger tooltip
+                type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
         },
-        size: {
-            height: 320,
-            width: 720
+        legend: {
+            data: words
         },
-        bar: {
-            width: 0.8 * (660/json[source][0].length-1)
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
         },
-        axis: {
-            x: {
+        series: {
+            name: 'Word breakdown',
+            type: 'pie',
+            radius: ['30%', '60%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 4,
+                borderColor: '#fff',
+                borderWidth: 1
+            },
+            label: {
+                show: false,
+                position: 'center'
+            },
+            emphasis: {
                 label: {
-                    text: "Time",
-                    position: "outer-middle"
-                },
-                type: 'timeseries',
-                tick: {
-                    count: 5,
-                    format: '%Y-%m-%d'
+                    show: true,
+                    fontSize: '20',
+                    fontWeight: 'bold'
                 }
             },
-            y2: {
-                label: {
-                    text: "Files processed",
-                    position: "outer-middle"
-                },
-                show: true
+            labelLine: {
+                show: false
             },
-            y: {
-                label: {
-                    text: "Issues found",
-                    position: "outer-middle"
-                },
-                show: true
+            data: items
+        }
+    };
+    myChart.setOption(options);
+}
+
+function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
+    let x_axis = [];
+    let files_processed = [];
+    source = source ? source : 'breakdown_timeline';
+    for (let z = 1; z < json[source][0].length; z++) {
+        if (typeof(json[source][0][z][0]) == 'number') {
+            let d = new Date(json[source][0][z][0] * 1000.0);
+            x_axis.push(d);
+            files_processed.push(json[source][0][z][1]);
+        }
+    }
+
+    let series = [];
+    let items = [];
+    for (let z = 1; z < json[source].length; z++) {
+        let item = json[source][z];
+        let title = item.shift();
+        items.push(title);
+        let s = {
+            name: title,
+            type: 'bar',
+            stack: 'total',
+            emphasis: {
+                focus: 'series'
+            },
+            data: item,
+            yAxisIndex: 0
+        };
+        series.push(s);
+    }
+    series.push({
+        name: "Files processed",
+        type: 'line',
+        emphasis: {
+            focus: 'series'
+        },
+        data: files_processed,
+        yAxisIndex: 1
+    })
+
+    chartDom = chartDom ? chartDom : document.getElementById('quickstats');
+    let myChart = echarts.init(chartDom);
+    let options = {
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: {            // Use axis to trigger tooltip
+                type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
             }
         },
-        data: {
-            x: 'x',
-            columns: json[source],
-            type: 'bar',
-            types: {
-                'Files processed': 'line',
-                'Scan duration': 'line',
+        title: {
+            text: ctitle
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: x_axis
+        },
+        yAxis: [{
+                type: 'value',
+                name: "Word count"
             },
-            groups: [
-                groupings
-            ],
-            axes: {
-                'Scan duration': 'y2',
-                'Files processed': 'y2'
-            },
-            colors: {
-                'Issues discovered': '#1686d2',
-                'Files processed': '#1cd216',
-                'Scan duration': '#d24b16'
+            {
+                type: "value",
+                name: "Files processed"
             }
-        }
-    });
+            ]
+        ,
+        series: series
+    };
+    if (legend) options.legend= {data: items};
+    myChart.setOption(options);
 }
 
 
@@ -371,38 +373,17 @@ async function prime_analysis(limit) {
 
     let n = 0;
     let parent = document.getElementById('quickstats');
+    parent.style.width = "740px";
+    parent.style.height = "300px";
 
     let no_files = 0;
     let no_issues = 0;
     let no_handled = 0;
     repository = stats.repo;
     reasons = stats.reasons;
-    quickstats('chart');
+    stacked_breakdown();
+    donut_breakdown();
 
-    c3.generate({
-        bindto: document.getElementById('quickstats_breakdown'),
-        title: {
-            text: "Word breakdown"
-        },
-        size: {
-            height: 320,
-            width: 480
-        },
-
-        data: {
-            columns: stats.breakdown,
-            type: 'donut'
-        },
-        tooltip: {
-            format: {
-                //title: function (d) { return 'Data ' + d; },
-                value: function (value, ratio, id) {
-                    console.log(value, ratio);
-                    return value.pretty() + " (" + (parseInt(ratio*1000) / 10.0) + "%)";
-                }
-            }
-        }
-    });
 
 
     let excludes = document.getElementById('excludes');

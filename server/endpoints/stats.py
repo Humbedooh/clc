@@ -37,17 +37,14 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
         path = os.path.join(server.config.dirs.scratch, repo)
         history = server.data.projects[repo].history
         if history:
-            history = history[-50:]
+            history = history[-20:]
             issues = ["Issues discovered"]
             processed = ["Files processed"]
-            duration: typing.List[typing.Union[str, int]] = ["Scan duration"]
             x = ["x"]
             for scan in history:
                 issues.append(scan["issues"])
-                processed.append(scan["files_processed"])
-                duration.append(int(scan["duration"]))
-                x.append(scan["epoch"])
-            out[repo] = [x, processed, issues, duration]
+                x.append([scan["epoch"], scan["files_processed"]])
+            out[repo] = [x, issues]
     return {
         "activity": server.data.activity,
         "stats": out,

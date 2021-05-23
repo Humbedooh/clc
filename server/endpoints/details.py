@@ -66,7 +66,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             for scan in hyml[-50:]:
                 br = scan.get('words_stacked')
                 if br:
-                    x_breakdown.append(scan["epoch"])
+                    x_breakdown.append([scan["epoch"], scan['files_processed']])
                     for word in x_words:
                         x_words[word].append(br.get(word, 0))
             breakdown_chart = [x_breakdown]
