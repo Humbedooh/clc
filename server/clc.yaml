@@ -22,3 +22,4 @@ debug:
 # User account settings - uncomment to enable
 acl:
 #  accounts_file: /x1/server/users.yaml
+#  auditlog: /x1/server/auditlog.txt

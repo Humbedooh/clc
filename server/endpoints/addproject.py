@@ -17,6 +17,7 @@
 
 import plugins.basetypes
 import plugins.session
+import plugins.auditlog
 
 """ New Project API end point for CLC"""
 
@@ -39,6 +40,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                     "excludes_context": [e for e in excludes_context if e],
                 }
             )
+            plugins.auditlog.log_entry(session, f"Added {repo_url} to list of projects")
             return {"okay": True, "message": "Project URL added to scan queue. Please wait for the next scan to run."}
         else:
             return {"okay": False, "message": "Project URL is already on the scan list"}

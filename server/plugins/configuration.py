@@ -49,6 +49,7 @@ class AccountConfig:
         subyaml = subyaml or {}
         self.accounts_file = subyaml.get('accounts_file')
         self.accounts = {}
+        self.audit_log = subyaml.get('auditlog', 'auditlog.txt')
         if self.accounts_file and os.path.exists(self.accounts_file):
             self.accounts = yaml.safe_load(open(self.accounts_file))
             self.accounts_file_stat = os.stat(self.accounts_file)
