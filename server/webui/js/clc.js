@@ -3,6 +3,7 @@ let reasons = {};
 let details_json = null;
 let projects_json = null;
 let defaults_json = null;
+let stats_json = null;
 let sort_order = -1;
 
 // Async POST to API
@@ -194,7 +195,8 @@ async function prime_projects_list(sortkey=0) {
 
 
 async function prime_intro() {
-    let details = await GET('/api/stats.json');
+    let details = stats_json ?  stats_json : await GET('/api/stats.json');
+    stats_json = details;
     details = typeof(details) == 'object' ? details : {stats: details, activity: 'unknown...!'};
     let stats = details.stats;
 
