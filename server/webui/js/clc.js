@@ -311,6 +311,7 @@ function radar_breakdown(stats, ctitle) {
                 xval += val;
             }
         }
+        xval = Math.log10(xval);
         categories.push({name: reason, max: max});
         items.push(xval);
         if (xval > max) max = xval;
@@ -328,7 +329,8 @@ function radar_breakdown(stats, ctitle) {
             trigger: 'item',
             axisPointer: {            // Use axis to trigger tooltip
                 type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
-            }
+            },
+            formatter: sort_radar
         },
         title: {
             text: ctitle? ctitle : "Current word breakdown",
@@ -353,6 +355,23 @@ function radar_breakdown(stats, ctitle) {
     };
     myChart.setOption(options);
 }
+
+
+function sort_radar(params) {
+    console.log(params)
+    let i = 0;
+    let html = "";
+    for (let reason in reasons) {
+        let val = 0;
+        if (!isNaN(params.value[i])) {
+            val = Math.round(Math.pow(10, params.value[i]));
+        }
+        html += `<b>${reason}: </b> ${val}<br/>`;
+        i++;
+    }
+    return html
+}
+
 
 function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
     let x_axis = [];
