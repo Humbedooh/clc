@@ -1,7 +1,11 @@
 let repository = null;
 let reasons = {};
-let json = null;
+let details_json = null;
+let projects_json = null;
+let defaults_json = null;
+let sort_order = -1;
 
+// Async POST to API
 async function POST(url = '', data = {}) {
     const response = await fetch(url, {
         method: 'POST',
@@ -18,8 +22,8 @@ async function POST(url = '', data = {}) {
     return response.json();
 }
 
+// Async GET from API
 async function GET(url = '') {
-
     let js = fetch(url, {
         method: 'GET',
         mode: 'cors',
@@ -34,6 +38,7 @@ async function GET(url = '') {
     return js
 }
 
+// Prettifier for large numbers (adds commas)
 Number.prototype.pretty = function(fix) {
     if (fix) {
         return String(this.toFixed(fix)).replace(/(\d)(?=(\d{3})+\.)/g, '$1,');
@@ -41,6 +46,7 @@ Number.prototype.pretty = function(fix) {
     return String(this.toFixed(0)).replace(/(\d)(?=(\d{3})+$)/g, '$1,');
 };
 
+// Adds a repo to the service
 async function add_repo() {
     let repo_url = document.getElementById('repo_url').value;
     let words = document.getElementById('words').value.split(/\r?\n/);
@@ -56,7 +62,10 @@ async function add_repo() {
             words_dict[k] = v;
         }
     }
-
+    if (!repo_url.match(/^(https?:\/\/|git:\/\/|ssh:)/)) {
+        alert("Repository URL must start with http(s)://, ssh: or git://");
+        return
+    }
     if (!repo_url.endsWith('.git')) {
         alert("Repository URL must end with .git!");
         return
@@ -75,6 +84,7 @@ async function add_repo() {
     }
 }
 
+// Saves/updates repository settings
 async function save_repo_settings() {
     let excludes = document.getElementById('excludes').value.split(/\n/);
     let excludes_context = document.getElementById('excludes_context').value.split(/\n/);
@@ -103,11 +113,6 @@ function show_repo_settings() {
         document.getElementById('settings_parent').style.display='none';
     }
 }
-
-
-let projects_json = null;
-let defaults_json = null;
-let sort_order = -1;
 
 
 async function prime_projects_list(sortkey=0) {
@@ -209,7 +214,7 @@ async function prime_intro() {
     let no_files = 0;
     let no_issues = 0;
     let no_projects = 0;
-    json = {};
+    details_json = {};
 
     for (let repo in stats) {
         n++;
@@ -227,7 +232,7 @@ async function prime_intro() {
         div.style.width = "400px";
         div.style.height = "180px";
         parent.appendChild(a);
-        json['breakdown_' + repo] = stats[repo];
+        details_json['breakdown_' + repo] = stats[repo];
         stacked_breakdown('breakdown_' + repo, div, repo, false);
 
     }
@@ -244,9 +249,9 @@ function donut_breakdown() {
     let myChart = echarts.init(chartDom);
     let items = [];
     let words = [];
-    for (let z= 0; z < json.breakdown.length; z++) {
-        let word = json.breakdown[z][0];
-        let val = json.breakdown[z][1];
+    for (let z= 0; z < details_json.breakdown.length; z++) {
+        let word = details_json.breakdown[z][0];
+        let val = details_json.breakdown[z][1];
         words.push(word);
         items.push({
             name: word,
@@ -303,11 +308,11 @@ function radar_breakdown(stats, ctitle) {
 
     for (let reason in reasons) {
         let xval = 0;
-        for (let z = 0; z < json.breakdown.length; z++) {
-            let word = json.breakdown[z][0];
-            let val = json.breakdown[z][1];
-            let xreason = json.details.bad_words[word];
-            if (xreason == reason) {
+        for (let z = 0; z < details_json.breakdown.length; z++) {
+            let word = details_json.breakdown[z][0];
+            let val = details_json.breakdown[z][1];
+            let xreason = details_json.details.bad_words[word];
+            if (xreason === reason) {
                 xval += val;
             }
         }
@@ -342,13 +347,13 @@ function radar_breakdown(stats, ctitle) {
             radius: 65
         },
         series: [{
-            name: json.repo,
+            name: details_json.repo,
             type: 'radar',
             areaStyle: {},
             data: [
                 {
                     value: items,
-                    name: json.repo
+                    name: details_json.repo
                 }
             ]
         }]
@@ -376,18 +381,18 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
     let x_axis = [];
     let files_processed = [];
     source = source ? source : 'breakdown_timeline';
-    for (let z = 1; z < json[source][0].length; z++) {
-        if (typeof(json[source][0][z][0]) == 'number') {
-            let d = new Date(json[source][0][z][0] * 1000.0);
+    for (let z = 1; z < details_json[source][0].length; z++) {
+        if (typeof(details_json[source][0][z][0]) == 'number') {
+            let d = new Date(details_json[source][0][z][0] * 1000.0);
             x_axis.push(d);
-            files_processed.push(json[source][0][z][1]);
+            files_processed.push(details_json[source][0][z][1]);
         }
     }
 
     let series = [];
     let items = [];
-    for (let z = 1; z < json[source].length; z++) {
-        let item = json[source][z];
+    for (let z = 1; z < details_json[source].length; z++) {
+        let item = details_json[source][z];
         let title = item.shift();
         items.push(title);
         let s = {
@@ -477,8 +482,8 @@ async function prime_analysis(limit) {
     document.getElementById('spinner').style.display = 'block';
     document.getElementById('stats').style.display = 'none';
     limit = limit ? limit : 500
-    let stats = await GET('/api/details.json' + location.search + "&limit=" + limit);
-    json = stats;
+    let stats = details_json ? details_json : await GET('/api/details.json' + location.search + "&limit=" + limit);
+    details_json = stats;
     document.getElementById('spinner').style.display = 'none';
     document.getElementById('stats').style.display = 'block';
 
@@ -488,9 +493,6 @@ async function prime_analysis(limit) {
     parent.style.width = "720px";
     parent.style.height = "260px";
 
-    let no_files = 0;
-    let no_issues = 0;
-    let no_handled = 0;
     repository = stats.repo;
     reasons = stats.reasons;
     stacked_breakdown();
@@ -518,7 +520,7 @@ async function prime_analysis(limit) {
         let issue = stats.issues[i];
         let tr = document.createElement('tr');
         tr.setAttribute('class', 'table-expand-row');
-        tr.setAttribute('data-open-details', true);
+        tr.setAttribute('data-open-details', "");
         tr.setAttribute('title', "Click to see the context in which this word appears");
 
         // Path
@@ -551,8 +553,8 @@ async function prime_analysis(limit) {
 
         // Resolution
         let resolution = 'Unresolved';
-        if (issue.resolution == 'ignore') resolution = 'Ignore word';
-        if (issue.resolution == 'intended') resolution = 'Intended word';
+        if (issue.resolution === 'ignore') resolution = 'Ignore word';
+        if (issue.resolution === 'intended') resolution = 'Intended word';
         let td_resolution = document.createElement('td');
         td_resolution.innerText = resolution;
         tr.appendChild(td_resolution);
@@ -580,7 +582,7 @@ async function prime_analysis(limit) {
 
     }
 
-    if (stats.issues.length == limit) {
+    if (stats.issues.length === limit) {
         let tr = document.createElement('tr');
         let td = document.createElement('td');
         td.setAttribute('colspan', '7');
@@ -616,8 +618,8 @@ function filter_results(txt) {
     let re = new RegExp(txt, 'i');
     for (let i = 0; i < trs.length; i++) {
         let tr = trs[i];
-        if (tr.getAttribute('class') == 'table-expand-row-content') continue
-        if (txt.length == 0 || tr.innerText.match(re)) {
+        if (tr.getAttribute('class') === 'table-expand-row-content') continue
+        if (txt.length === 0 || tr.innerText.match(re)) {
             tr.style.display = "table-row";
         } else {
             tr.style.display = "none";
@@ -625,7 +627,8 @@ function filter_results(txt) {
     }
 }
 
-function show_stat(which) {
+
+function analysis_show_stat(which) {
     document.getElementById('quickstats_donut').style.display = 'none';
     document.getElementById('quickstats_radar').style.display = 'none';
     document.getElementById(which).style.display = 'inline-block';
