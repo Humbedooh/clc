@@ -482,7 +482,7 @@ async function prime_analysis(limit) {
     document.getElementById('spinner').style.display = 'none';
     document.getElementById('stats').style.display = 'block';
 
-
+    document.title = `Analysis: ${stats.repo} |  CLC`;
     let n = 0;
     let parent = document.getElementById('quickstats');
     parent.style.width = "720px";
