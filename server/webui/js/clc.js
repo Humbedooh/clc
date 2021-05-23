@@ -106,7 +106,7 @@ function show_repo_settings() {
 
 
 let projects_json = null;
-let sort_order = 1;
+let sort_order = -1;
 
 
 async function prime_projects_list(sortkey=0) {
