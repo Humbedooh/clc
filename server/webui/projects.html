@@ -64,11 +64,11 @@
     </div>
     <table class="table-expand">
       <thead>
-      <tr class="table-expand-row">
-        <th>Project</th>
-        <th>Source</th>
-        <th class="text-right">Issues found</th>
-        <th class="text-right">Files processed</th>
+      <tr class="table-expand-row" style="user-select: none;">
+        <th onclick="prime_projects_list(0);">Project</th>
+        <th onclick="prime_projects_list(1);">Source &updownarrow;</th>
+        <th class="text-right" onclick="prime_projects_list(2);">Issues found &updownarrow;</th>
+        <th class="text-right" onclick="prime_projects_list(3);">Files processed &updownarrow;</th>
       </tr>
       </thead>
       <tbody id="projects_parent">

@@ -105,26 +105,20 @@ function show_repo_settings() {
 }
 
 
+let projects_json = null;
+let sort_order = 1;
 
 
-async function prime_projects_list() {
-    let defaults = await GET('/api/defaults.json');
-
-    document.getElementById('excludes').textContent = defaults.excludes.join("\n");
-    document.getElementById('excludes_context').textContent = defaults.excludes_context.join("\n");
-    let bad_words = [];
-    for (let k in defaults.words||{}) {
-        bad_words.push(`${k}: ${defaults.words[k]}`);
-    }
-    document.getElementById('words').textContent = bad_words.join("\n");
-
-    let stats = await GET('/api/all.json');
+async function prime_projects_list(sortkey=0) {
+    let stats = projects_json ? projects_json : await GET('/api/all.json');
+    projects_json = stats;
 
     let parent = document.getElementById('projects_parent');
+    parent.innerHTML = "";
 
-    let no_files = 0;
-    let no_issues = 0;
     let no_projects = 0;
+
+    let rows = [];
 
     for (let repo in stats) {
         let project = stats[repo];
@@ -159,11 +153,22 @@ async function prime_projects_list() {
         td_scanned.innerText = project.status.files_processed.pretty();
         tr.appendChild(td_scanned);
 
+        rows.push(tr);
 
+    }
 
+    sort_order *= -1;
+    rows.sort((a,b) => {
+            let x = a.childNodes[sortkey].textContent.replace(',', '');
+            let y = b.childNodes[sortkey].textContent.replace(',', '');
+            x = parseInt(x) ? parseInt(x) : x;
+            y = parseInt(y) ? parseInt(y) : y;
+            return x == y ? 0 : y > x ? -1*sort_order : 1*sort_order
+        }
+    )
 
-        parent.appendChild(tr);
-
+    for (let i = 0; i < rows.length; i++) {
+        parent.appendChild(rows[i]);
     }
 
 }
