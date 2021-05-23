@@ -358,7 +358,6 @@ function radar_breakdown(stats, ctitle) {
 
 
 function sort_radar(params) {
-    console.log(params)
     let i = 0;
     let html = "";
     for (let reason in reasons) {
