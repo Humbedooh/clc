@@ -222,8 +222,8 @@ async function prime_intro() {
 
 function donut_breakdown() {
     let chartDom = document.getElementById('quickstats_donut');
-    chartDom.style.width = "400px";
-    chartDom.style.height = "300px";
+    chartDom.style.width = "280px";
+    chartDom.style.height = "250px";
     let myChart = echarts.init(chartDom);
     let items = [];
     let words = [];
@@ -270,6 +270,77 @@ function donut_breakdown() {
             },
             data: items
         },
+        toolbox: {
+            show: true,
+            feature: {
+                mark: {show: true},
+                dataView: {show: true, readOnly: false},
+                saveAsImage: {show: true},
+            }
+        }
+    };
+    myChart.setOption(options);
+}
+
+
+function radar_breakdown(stats, ctitle) {
+    let chartDom = document.getElementById('quickstats_radar');
+    chartDom.style.width = "240px";
+    chartDom.style.height = "250px";
+    let myChart = echarts.init(chartDom);
+    let categories = [];
+    let items = [];
+    let max = 0;
+
+    for (let reason in reasons) {
+        let xval = 0;
+        for (let z = 0; z < json.breakdown.length; z++) {
+            let word = json.breakdown[z][0];
+            let val = json.breakdown[z][1];
+            let xreason = json.details.bad_words[word];
+            if (xreason == reason) {
+                xval += val;
+            }
+        }
+        categories.push({name: reason, max: max});
+        items.push(xval);
+        if (xval > max) max = xval;
+    }
+    for (let i = 0; i < categories.length; i++) {
+        if (categories[i].max > max) max = categories[i].max;
+    }
+    for (let i = 0; i < categories.length; i++) {
+        categories[i].max = max;
+    }
+
+    items = items.sort((a,b) => b.value - a.value);
+    let options = {
+        tooltip: {
+            trigger: 'item',
+            axisPointer: {            // Use axis to trigger tooltip
+                type: 'shadow'        // 'shadow' as default; can also be 'line' or 'shadow'
+            }
+        },
+        title: {
+            text: ctitle? ctitle : "Current word breakdown",
+            left: 'center'
+        },
+        radar: {
+            // shape: 'circle',
+            indicator: categories,
+            radius: 65
+        },
+        series: [{
+            name: json.repo,
+            type: 'radar',
+            areaStyle: {},
+            data: [
+                {
+                    value: items,
+                    name: json.repo
+                }
+            ]
+        }],
         toolbox: {
             show: true,
             feature: {
@@ -395,8 +466,8 @@ async function prime_analysis(limit) {
 
     let n = 0;
     let parent = document.getElementById('quickstats');
-    parent.style.width = "740px";
-    parent.style.height = "300px";
+    parent.style.width = "720px";
+    parent.style.height = "260px";
 
     let no_files = 0;
     let no_issues = 0;
@@ -405,6 +476,7 @@ async function prime_analysis(limit) {
     reasons = stats.reasons;
     stacked_breakdown();
     donut_breakdown();
+    radar_breakdown(stats.breakdown, "Context disposition");
 
 
 
@@ -532,4 +604,10 @@ function filter_results(txt) {
             tr.style.display = "none";
         }
     }
+}
+
+function show_stat(which) {
+    document.getElementById('quickstats_donut').style.display = 'none';
+    document.getElementById('quickstats_radar').style.display = 'none';
+    document.getElementById(which).style.display = 'inline-block';
 }

@@ -61,9 +61,16 @@
     <h3>Scan results over time</h3>
   </div>
 
-  <div class="grid-x grid-margin-x medium-up-3 large-up-4">
-    <div class="cell" style="width: 740px;" id="quickstats"></div>
-    <div class="cell" style="width: 400px;" id="quickstats_donut"></div>
+  <div class="grid-x grid-margin-x medium-up-3 large-up-3">
+    <div class="cell" style="width: 940px;" id="quickstats"></div>
+    <div class="cell" style="width: 360px;" id="quickstats_side">
+      <div class="cell" style="width: 360px;" id="quickstats_donut"></div>
+      <div class="cell" style="width: 360px; display: none;" id="quickstats_radar"></div>
+      <select style="display: inline-block; width: 260px;" id="d_select" onchange="show_stat(this.value);">
+        <option value="quickstats_donut">Current word breakdown</option>
+        <option value="quickstats_radar">Context disposition</option>
+      </select>
+    </div>
 
   </div>
   <a href="javascript:void(show_repo_settings());">Scan settings...</a>
