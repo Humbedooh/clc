@@ -331,12 +331,13 @@ async def run_tasks(server: plugins.basetypes.Server):
                 reload_files = True
             else:
                 if mtime and mtime.st_mtime != server.data.projects[repo].mtimes.get(_clc_yaml_path, 0):
+                    print(f"{_clc_yaml_path} changed on disk, reloading.")
                     reload_files = True
                 if hmtime and hmtime.st_mtime != server.data.projects[repo].mtimes.get(_clc_yaml_history_path, 0):
+                    print(f"{_clc_yaml_history_path} changed on disk, reloading.")
                     reload_files = True
 
             if reload_files:
-                print(f"{_clc_yaml_path} changed on disk, reloading.")
                 if os.path.exists(_clc_yaml_path):
                     yml = yaml.safe_load(open(_clc_yaml_path))
                     server.data.projects[repo].settings = yml
