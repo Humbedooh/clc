@@ -319,6 +319,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
     }
 
     chartDom = chartDom ? chartDom : document.getElementById('quickstats');
+    chartDom.style.marginBottom = '24px';
     let myChart = echarts.init(chartDom);
     let options = {
         tooltip: {
