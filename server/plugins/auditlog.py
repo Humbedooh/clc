@@ -25,7 +25,7 @@ def log_entry(session: plugins.session.SessionObject, entry: str):
     if session.server.config.accounts.audit_log:
         try:
             with open(session.server.config.accounts.audit_log, "a") as f:
-                user = session and session.credentials and session.credentials.username or "Anonymous"
+                user = session and session.credentials and session.credentials.uid or "Anonymous"
                 when = datetime.datetime.now().isoformat()
                 f.write(f"[{user} {when}]: {entry}\n")
                 f.close()
