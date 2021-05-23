@@ -2,6 +2,8 @@ from __future__ import annotations
 import os
 import typing
 
+import yaml
+
 
 class ServerConfig:
     def __init__(self, subyaml: dict):
@@ -42,6 +44,18 @@ class Project:
         self.issues_per_file = {}
 
 
+class AccountConfig:
+    def __init__(self, subyaml: dict):
+        subyaml = subyaml or {}
+        self.accounts_file = subyaml.get('accounts_file')
+        self.accounts = {}
+        if self.accounts_file and os.path.exists(self.accounts_file):
+            self.accounts = yaml.safe_load(open(self.accounts_file))
+            self.accounts_file_stat = os.stat(self.accounts_file)
+        else:
+            self.accounts_file_stat = None
+
+
 class Configuration:
     def __init__(self, yml: dict, dyml: dict):
         self.server: ServerConfig = ServerConfig(yml.get("server", {}))
@@ -49,6 +63,7 @@ class Configuration:
         self.oauth: OAuthConfig = OAuthConfig(yml.get("oauth", {}))
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))
         self.debug: DebugConfig = DebugConfig(yml.get("debug", {}))
+        self.accounts: AccountConfig = AccountConfig(yml.get('acl', {}))
         self.words = dyml.get("words", [])
         self.excludes = dyml.get("excludes", [])
         self.excludes_context = dyml.get("excludes_context", [])

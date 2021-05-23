@@ -278,6 +278,15 @@ async def run_tasks(server: plugins.basetypes.Server):
     await asyncio.sleep(3)
     while True:
         #  print("Running background tasks...")
+        if server.config.accounts.accounts_file and os.path.exists(server.config.accounts.accounts_file):
+            astat = os.stat(server.config.accounts.accounts_file)
+            if astat and (
+                    not server.config.accounts.accounts_file_stat or
+                    astat.st_mtime != server.config.accounts.accounts_file_stat.st_mtime
+            ):
+                print(f"{server.config.accounts.accounts_file} changed on disk, reloading")
+                server.config.accounts.accounts = yaml.safe_load(open(server.config.accounts.accounts_file))
+                server.config.accounts.accounts_file_stat = os.stat(server.config.accounts.accounts_file)
         pqueue = server.data.project_queue[:]
         server.data.project_queue = []
         for item in pqueue:

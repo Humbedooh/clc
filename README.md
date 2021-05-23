@@ -42,3 +42,11 @@ It contains a set of potentially problematic words and their contexts, as well a
 list (both files and sentence contexts) for where the words are either unavoidable or harmless.
 
 Any new project added will use these defaults unless otherwise specified in the project settings.
+
+## User accounts
+When `open_server` is set to `false`, only logged-in users may add/edit projects. 
+The account file to use is defined in `clc.yaml` under the `acl` section. A sample configuration 
+file has been provided in this repo, `users.sample.yaml`.
+
+The distinction between admin and user is that admins will be able to see the audit logs
+for the server, whereas normal users will not. Only plain logins are currently supported.

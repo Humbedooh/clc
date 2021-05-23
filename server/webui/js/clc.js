@@ -637,3 +637,48 @@ function analysis_show_stat(which) {
     document.getElementById('quickstats_radar').style.display = 'none';
     document.getElementById(which).style.display = 'inline-block';
 }
+
+function prime_oauth() {
+    // pass...
+}
+
+// plain login
+async function login() {
+    let username = document.getElementById('username').value;
+    let password = document.getElementById('password').value;
+    let result = await POST('api/oauth.json', {
+        username: username,
+        password: password
+    });
+    if (!result.okay) {
+        alert(result.message);
+    } else {
+        location.href = './'
+    }
+}
+
+async function logout() {
+    let result = await GET('api/preferences?logout=true');
+    location.href = location.href;
+}
+
+async function prime_prefs() {
+    let prefs = await GET('api/preferences.json');
+    if (prefs && prefs.login !== null) {
+        let lbar = document.getElementById('login');
+        lbar.innerHTML = "";
+
+        let alogout = document.createElement('a');
+        alogout.setAttribute('href', 'javascript:void(logout());');
+        alogout.innerText = "Log out";
+        alogout.style.display = "inline-block";
+        lbar.appendChild(alogout);
+
+        let welcome = document.createElement('span');
+        welcome.setAttribute('class', 'menu-text');
+        welcome.innerText = "Welcome, " + prefs.login.username;
+        lbar.appendChild(welcome);
+    }
+}
+
+window.addEventListener('load', prime_prefs);

@@ -1,0 +1,10 @@
+demo:
+  name: "Demo user"
+  email: demo@example.org
+  type: user
+  password_plain: clcdemo
+administrator:
+  name: "Administrator"
+  email: admin@example.org
+  type: admin
+  password_plain: somepassword

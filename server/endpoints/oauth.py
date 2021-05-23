@@ -45,6 +45,25 @@ async def process(
         return aiohttp.web.Response(
             headers={"set-cookie": cookie, "content-type": "application/json"}, status=200, text='{"okay": true}',
         )
+
+    # Plain text login
+    usr = indata.get('username')
+    pwd = indata.get('password')
+    if usr and pwd:
+        if usr in server.config.accounts.accounts:
+            account = server.config.accounts.accounts[usr]
+            xpwd = None
+            # So far, just plain text support
+            if 'password_plain' in account:
+                xpwd = account['password_plain']
+            if xpwd and pwd == xpwd:  # Correct credentials!
+                cookie = await plugins.session.set_session(
+                    server, uid=usr, name=account.get('name', usr), email=account.get('email', usr)
+                )
+                return aiohttp.web.Response(
+                    headers={"set-cookie": cookie, "content-type": "application/json"}, status=200, text='{"okay": true}',
+                )
+        return {"okay": False, "message": "Invalid credentials supplied."}
     return {"okay": False, "message": "Could not process OAuth login!"}
 
 
