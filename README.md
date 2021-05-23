@@ -20,8 +20,15 @@ The simplest form is to use the provided `Dockerfile` as such:
 
 And visit http://localhost:8080/ for goodness!
 
-
-## Speeding up YAML parsing
+### Speeding up YAML parsing
 If you have a project with a lot of issues (10,000+), you can make use of the 
 C++ YAML parser in python by installing the `libyaml-cpp-dev` package before you 
 instapp PyYaml. This will speed up YAML parsing/writing by 10x.
+
+
+## Default scan options
+The default set or words and contexts to scan for is defined in the `defaults.yaml` file.
+It contains a set of potentially problematic words and their contexts, as well as an exclude 
+list (both files and sentence contexts) for where the words are either unavoidable or harmless.
+
+Any new project added will use these defaults unless otherwise specified in the project settings.
