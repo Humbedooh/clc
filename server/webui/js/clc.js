@@ -236,6 +236,7 @@ function donut_breakdown() {
             value: val
         });
     }
+    items = items.sort((a,b) => b.value - a.value);
     let options = {
         tooltip: {
             trigger: 'item',
