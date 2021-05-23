@@ -25,7 +25,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
     return {
         "words": server.config.words,
         "excludes": server.config.excludes,
-        "excludes_context": [],
+        "excludes_context": server.config.excludes_context,
     }
 
 

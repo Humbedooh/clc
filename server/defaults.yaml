@@ -35,5 +35,5 @@ excludes:
   - "*.svg"
 
 # Word contexts to exclude from scans
-exclude_contexts:
+excludes_context:
   - webmaster
