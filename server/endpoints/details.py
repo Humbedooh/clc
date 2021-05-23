@@ -61,7 +61,8 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                 br = scan.get('words_stacked')
                 if br:
                     for word in br:
-                        x_words[word] = []
+                        if br[word]:
+                            x_words[word] = []
             for scan in hyml[-50:]:
                 br = scan.get('words_stacked')
                 if br:
