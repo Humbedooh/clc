@@ -314,6 +314,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         yAxisIndex: 1
     })
     let toppx = '32px';
+    if (ctitle) toppx = '56px';
     if (legend) {
         toppx = items.length > 5 ? '80px' : '60px';
     }
