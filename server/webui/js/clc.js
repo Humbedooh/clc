@@ -222,7 +222,7 @@ async function prime_intro() {
 
 function donut_breakdown() {
     let chartDom = document.getElementById('quickstats_donut');
-    chartDom.style.width = "300px";
+    chartDom.style.width = "400px";
     chartDom.style.height = "300px";
     let myChart = echarts.init(chartDom);
     let items = [];
@@ -253,10 +253,13 @@ function donut_breakdown() {
                 borderColor: '#fff',
                 borderWidth: 1
             },
+            label: {
+                show: true
+            },
             emphasis: {
                 label: {
                     show: true,
-                    fontSize: '20',
+                    fontSize: '15',
                     fontWeight: 'bold'
                 }
             },
@@ -322,6 +325,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
             left: '3%',
             right: '4%',
             bottom: '3%',
+            top: '80px',
             containLabel: true
         },
         xAxis: {
