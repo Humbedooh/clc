@@ -37,3 +37,9 @@ excludes:
 # Word contexts to exclude from scans
 excludes_context:
   - webmaster
+
+# Word matching logic
+match_logic:
+  short_words: "(?:\\b|_)+({word})(?:ed|ing|s)?(?:\\b|\\W|_)+"
+  short_word_limit: 5   # Anything more than 5 characters will use long word logic
+  long_words: "({word})"

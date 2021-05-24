@@ -44,6 +44,13 @@ class Project:
         self.issues_per_file = {}
 
 
+class LogicConfig:
+    def __init__(self, subyaml: dict):
+        self.short_word_limit = int(subyaml.get('short_word_limit', 5))
+        self.short_word_regex = subyaml.get('short_words', r"(?:\b|_)+({word})(?:ed|ing|s)?(?:\b|\W|_)+")
+        self.long_word_regex = subyaml.get('long_words', r"({word})")
+
+
 class AccountConfig:
     def __init__(self, subyaml: dict):
         subyaml = subyaml or {}
@@ -65,6 +72,7 @@ class Configuration:
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))
         self.debug: DebugConfig = DebugConfig(yml.get("debug", {}))
         self.accounts: AccountConfig = AccountConfig(yml.get('acl', {}))
+        self.logic: LogicConfig = LogicConfig(dyml.get('match_logic', {}))
         self.words = dyml.get("words", [])
         self.excludes = dyml.get("excludes", [])
         self.excludes_context = dyml.get("excludes_context", [])

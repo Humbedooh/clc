@@ -156,12 +156,12 @@ async def scan_project(server, project, path):
         bad_words_re = {}
         for word in bad_words:
             # If large word, find it anywhere
-            if len(word) > 5:
-                bad_words_re[word] = re.compile(r"(" + word + r")", flags=re.UNICODE)
+            if len(word) > server.config.logic.short_word_limit:
+                bad_words_re[word] = re.compile(server.config.logic.long_word_regex.replace("{word}", word), flags=re.UNICODE)
             # If smaller word, require boundaries but allow for common endings such as 'ing'
             else:
                 bad_words_re[word] = re.compile(
-                    r"(?:\b|\W|_)+(" + word + r")(?:ed|ing|s)?(?:\b|\W|_)+", flags=re.UNICODE
+                    server.config.logic.short_word_regex.replace("{word}", word), flags=re.UNICODE
                 )
             bad_words_stacked[word] = 0
 
