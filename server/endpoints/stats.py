@@ -34,7 +34,6 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
     repos = [x[0] for x in sorted(repos, key=lambda x: x[1], reverse=True)]
 
     for repo in repos:
-        path = os.path.join(server.config.dirs.scratch, repo)
         history = server.data.projects[repo].history
         if history:
             history = history[-20:]
