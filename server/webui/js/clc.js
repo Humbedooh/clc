@@ -676,7 +676,7 @@ async function prime_prefs() {
 
         let welcome = document.createElement('span');
         welcome.setAttribute('class', 'menu-text');
-        welcome.innerText = "Welcome, " + prefs.login.username;
+        welcome.innerText = "Welcome, " + prefs.login.name;
         lbar.appendChild(welcome);
     }
 }
