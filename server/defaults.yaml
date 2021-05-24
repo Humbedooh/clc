@@ -40,6 +40,7 @@ excludes_context:
 
 # Word matching logic
 match_logic:
+  # For short words, match if surrounded by boundaries, but also allow for common endings, -ing, -er, -s etc
   short_words: "(?:\\b|_)+({word})(?:ed|ing|s)?(?:\\b|\\W|_)+"
   short_word_limit: 5   # Anything more than 5 characters will use long word logic
-  long_words: "({word})"
+  long_words: "({word})"  # For long words, match anywhere inside the text
