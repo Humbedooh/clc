@@ -130,3 +130,7 @@ dmypy.json
 /server/Pipfile
 /server/Pipfile.lock
 /.idea
+
+# CLC files I use...
+server/auditlog.txt
+server/users.yaml
