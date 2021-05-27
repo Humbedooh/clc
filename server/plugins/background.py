@@ -134,7 +134,19 @@ async def scan_project(server, project, path):
     params = (
         "-C",
         path,
-        "pull",
+        "fetch",
+    )
+    proc = await asyncio.create_subprocess_exec(
+        git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await proc.communicate()
+    assert proc.returncode == 0, "Git fetch returned non-null: " + str(stderr)
+    params = (
+        "-C",
+        path,
+        "reset",
+        "--hard",
+        "HEAD"
     )
     proc = await asyncio.create_subprocess_exec(
         git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
