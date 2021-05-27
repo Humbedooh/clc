@@ -26,7 +26,7 @@ except:
     from yaml import Loader as loader, Dumper as dumper
 
 LOCK = threading.Lock()
-MERGE_ISSUES = False
+MERGE_ISSUES = True
 
 
 def process_files(tid, server, files: queue.Queue, path, excludes, bad_words, bad_words_re, excludes_context):
@@ -202,6 +202,29 @@ async def scan_project(server, project, path):
                 for k, v in bad_words_tmp.items():
                     bad_words_stacked[k] += v
 
+
+
+        # Compile current issues, merging in old ones
+        clc_issues_file = os.path.join(path, "_clc_issues.yaml")
+        if MERGE_ISSUES:
+            clc_ignore_file = os.path.join(path, "_clc_ignores.yaml")
+            if os.path.exists(clc_ignore_file):
+                clc_ignores = yaml.safe_load(open(clc_ignore_file))
+                for issue in current_issues:
+                    for ignore in clc_ignores:
+                        xpath = issue["path"].replace(path, '', 1)
+                        if ignore["path"] == xpath:
+                            if ignore["line"] in ("*", issue["line"]) and ignore["word"] == issue["word"]:
+                                if ignore["mark"] == issue["mark"]:
+                                    issue["resolution"] = ignore["resolution"]
+                                    issue["line"] = ignore["line"]
+                                    issue["word"] = ignore["word"]
+                                    if issue["resolution"] == "ignore":
+                                        bad_words_stacked[issue["word"]] -= 1
+                                        problems_found -= 1
+                                    break
+
+
         taken = time.time() - now
         if server.config.debug.print_issues:
             print(
@@ -219,22 +242,6 @@ async def scan_project(server, project, path):
         }
 
         scan_history.append(yml["status"])
-
-        # Compile current issues, merging in old ones
-        clc_issues = []
-        clc_issues_file = os.path.join(path, "_clc_issues.yaml")
-        if MERGE_ISSUES:
-            if os.path.exists(clc_issues_file):
-                clc_issues = yaml.safe_load(open(clc_issues_file))
-            for issue in current_issues:
-                for old_issue in clc_issues:
-                    if old_issue["path"] == issue["path"]:
-                        if old_issue["line"] in ("*", issue["line"]) and old_issue["word"] == issue["word"]:
-                            issue["resolution"] = old_issue["resolution"]
-                            issue["line"] = old_issue["line"]
-                            issue["word"] = old_issue["word"]
-                            if issue["resolution"] == "ignore":
-                                problems_found -= 1
 
         # Save updated settings
         project.settings = yml

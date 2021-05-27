@@ -482,6 +482,23 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
 }
 
 
+async function ignore_word(td, tr, repo, word, file, line, column) {
+    let rv = await POST('api/ignore.json', {
+        repo: repo,
+        word: word,
+        path: file,
+        line: line,
+        column: column
+    });
+    if (rv.okay) {
+        tr.style.display = 'none';
+        td.parentElement.style.display = 'none';
+    } else {
+        alert(rv.message);
+    }
+    return false;
+}
+
 async function prime_analysis(limit) {
     document.getElementById('spinner').style.display = 'block';
     document.getElementById('stats').style.display = 'none';
@@ -567,6 +584,16 @@ async function prime_analysis(limit) {
         } else {
             tr.style.color = '#080';
         }
+
+        // Actions
+        let actions = document.createElement('td');
+        let ibtn = document.createElement('button');
+        ibtn.setAttribute('title', "Click to tell CLC to not count this occurrence in its statistics");
+        ibtn.setAttribute('class', 'button small');
+        ibtn.innerText = "Ignore word";
+        ibtn.addEventListener('click', () => ignore_word(actions, tr, stats.repo, issue.word, issue.path, issue.line, issue.mark));
+        actions.appendChild(ibtn);
+        tr.appendChild(actions);
 
         issues_parent.appendChild(tr);
 

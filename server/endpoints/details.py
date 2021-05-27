@@ -101,6 +101,8 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             yml = yaml.load(ymldata, Loader=loader)
             yml = yml[:limit]
             for issue in yml:
+                if issue["resolution"] == "ignore":
+                    continue
                 issue["path"] = issue["path"].replace(path, "", 1)
                 if not out["breakdown"]:
                     if issue["word"] not in issues_stacked:
