@@ -539,10 +539,16 @@ async function prime_analysis(limit) {
     issues_parent.innerHTML = "";
     for (let i=0; i < stats.issues.length; i++) {
         let issue = stats.issues[i];
+        let ignore = issue.resolution == 'ignore';
         let tr = document.createElement('tr');
         tr.setAttribute('class', 'table-expand-row');
         tr.setAttribute('data-open-details', "");
         tr.setAttribute('title', "Click to see the context in which this word appears");
+        if (ignore) {
+            tr.style.background = '#DDD';
+            tr.style.color = '#555';
+            tr.setAttribute('title', "This occurrence is being ignored by the scanner.");
+        }
 
         // Path
         let td_path = document.createElement('td');
@@ -587,12 +593,14 @@ async function prime_analysis(limit) {
 
         // Actions
         let actions = document.createElement('td');
-        let ibtn = document.createElement('button');
-        ibtn.setAttribute('title', "Click to tell CLC to not count this occurrence in its statistics");
-        ibtn.setAttribute('class', 'button small');
-        ibtn.innerText = "Ignore word";
-        ibtn.addEventListener('click', () => ignore_word(actions, tr, stats.repo, issue.word, issue.path, issue.line, issue.mark));
-        actions.appendChild(ibtn);
+        if (!ignore) {
+            let ibtn = document.createElement('button');
+            ibtn.setAttribute('title', "Click to tell CLC to not count this occurrence in its statistics");
+            ibtn.setAttribute('class', 'button small');
+            ibtn.innerText = "Ignore word";
+            ibtn.addEventListener('click', () => ignore_word(actions, tr, stats.repo, issue.word, issue.path, issue.line, issue.mark));
+            actions.appendChild(ibtn);
+        }
         tr.appendChild(actions);
 
         issues_parent.appendChild(tr);
