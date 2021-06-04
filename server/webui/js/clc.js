@@ -67,11 +67,12 @@ async function add_repo() {
         alert("Repository URL must start with http(s)://, ssh: or git://");
         return
     }
+    // Typically, a git URL ends in .git. We have this check to notify people if they try to check out a potentially wrong URL.
     if (!repo_url.endsWith('.git')) {
-        alert("Repository URL must end with .git!");
-        return
+        if (!confirm("You are trying to check out a repository URL that does not end in .git. Are you sure this is what you intended?")) return
     }
-    if (repo_url.length > 10 && repo_url.endsWith('.git')) {
+    // Minimum URL size: git:a.bc:d
+    if (repo_url.length > 10) {
         let rv = await POST('/api/addproject.json', {
             url: repo_url,
             branch: branch,
