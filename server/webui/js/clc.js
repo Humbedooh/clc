@@ -103,7 +103,7 @@ async function add_org() {
             words_dict[k] = v;
         }
     }
-    if (!orgid.match(/^([A-Za-z0-9]+)/)) {
+    if (!orgid.match(/^([-A-Za-z0-9]+)/)) {
         alert("Org ID must be alphanumerical only");
         return
     }
