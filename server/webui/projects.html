@@ -33,7 +33,8 @@
 
 <article class="grid-container">
   <h2>All projects</h2>
-  <a href="#" onclick="document.getElementById('add_project').style.display='block';" class="button">Add a new project</a>
+  <a href="#" onclick="document.getElementById('add_project').style.display='block';" class="button">Add a new repository</a>
+  <a href="#" onclick="document.getElementById('add_org').style.display='block';" class="button">Add a GitHub organization</a>
   <div class="grid-x grid-margin-x medium-up-3 large-up-4" id="projects">
 
     <div id="add_project" style="display: none; width: 100%; background: #EEF; padding: 8px;">
@@ -63,6 +64,35 @@
 
     <input type="button" class="button" value="Add repository" onclick="add_repo();">
     </div>
+
+    <div id="add_org" style="display: none; width: 100%; background: #EEF; padding: 8px;">
+      <h4>Add a new project repository:</h4>
+      <select id="org_provider">
+        <option value="github">GitHub (https://github.com/orgname/*.git)</option>
+      </select>
+      Organization ID: <input type="text" id="org_id" placeholder="orgname"/>
+      <small>Note: only public repositories will be checked. Currently only GitHub is supported</small><hr/>
+      <big>Scanner defaults: <small>(you can always adjust these settings later)</small></big><br/><br/>
+      <div class="grid-x grid-margin-x medium-up-3 large-up-3" id="org_settings">
+        <div class="cell">
+          Excludes files (GLOB):<br/>
+          <textarea id="org_excludes" style="height: 120px;"></textarea>
+        </div>
+        <div class="cell">
+          Bad words and context:<br/>
+          <textarea id="org_words" style="height: 120px;"></textarea>
+          <small><i><kbd>word: context</kbd> key/value pairs of bad words and their context</i></small>
+        </div>
+        <div class="cell">
+          Bad words exclude contexts:<br/>
+          <textarea id="org_excludes_context" style="height: 120px;"></textarea>
+          <small><i>This must be a list of regular expressions that matches contexts in which to ignore bad words.</i></small>
+        </div>
+      </div>
+
+      <input type="button" class="button" value="Add organization" onclick="add_org();">
+    </div>
+
     <table class="table-expand">
       <thead>
       <tr class="table-expand-row" style="user-select: none;">

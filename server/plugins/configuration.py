@@ -20,6 +20,7 @@ class TaskConfig:
 
 class OAuthConfig:
     def __init__(self, subyaml: dict):
+        self.github_key: str = subyaml.get("github_api_key", "")
         self.authoritative_domains: typing.List[str] = subyaml.get("authoritative_domains", [])
         self.admins: typing.List[str] = subyaml.get("admins", "").split(" ")
 

@@ -86,6 +86,43 @@ async function add_repo() {
     }
 }
 
+// Adds a repo to the service
+async function add_org() {
+    let provider = document.getElementById('org_provider').value;
+    let orgid = document.getElementById('org_id').value;
+    let words = document.getElementById('org_words').value.split(/\r?\n/);
+    let excludes = document.getElementById('org_excludes').value.split(/\r?\n/);
+    let excludes_context = document.getElementById('org_excludes_context').value.split(/\r?\n/);
+    let branch = '';
+    let words_dict = {};
+    for (let i = 0; i < words.length; i++) {
+        let arr = words[i].split(/:/);
+        if (arr.length == 2) {
+            let k = arr[0].trim();
+            let v = arr[1].trim();
+            words_dict[k] = v;
+        }
+    }
+    if (!orgid.match(/^([A-Za-z0-9]+)/)) {
+        alert("Org ID must be alphanumerical only");
+        return
+    }
+
+    if (orgid.length > 1) {
+        let rv = await POST('/api/addorg.json', {
+            provider: provider,
+            id: orgid,
+            branch: branch,
+            excludes: excludes,
+            words: words_dict,
+            excludes_context: excludes_context
+        })
+        alert(rv.message);
+        document.getElementById('add_org').style.display = 'none';
+    }
+}
+
+
 // Saves/updates repository settings
 async function save_repo_settings() {
     let excludes = document.getElementById('excludes').value.split(/\n/);
@@ -123,11 +160,14 @@ async function prime_projects_list(sortkey=0) {
 
     document.getElementById('excludes').textContent = defaults.excludes.join("\n");
     document.getElementById('excludes_context').textContent = defaults.excludes_context.join("\n");
+    document.getElementById('org_excludes').textContent = defaults.excludes.join("\n");
+    document.getElementById('org_excludes_context').textContent = defaults.excludes_context.join("\n");
     let bad_words = [];
     for (let k in defaults.words||{}) {
         bad_words.push(`${k}: ${defaults.words[k]}`);
     }
     document.getElementById('words').textContent = bad_words.join("\n");
+    document.getElementById('org_words').textContent = bad_words.join("\n");
 
     let stats = projects_json ? projects_json : await GET('/api/all.json');
     projects_json = stats;
