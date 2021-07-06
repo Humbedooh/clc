@@ -57,7 +57,6 @@ async def github_repos(server: plugins.basetypes.Server, login: str) -> typing.L
                     GRAPHQL_URL, json={"query": query % (login, after)}
             ) as rv:
                 js = await rv.json()
-                print(js)
                 for edge in js["data"]["organization"]["repositories"]["edges"]:
                     repo = edge['node']['name']
                     repos.append(repo)
