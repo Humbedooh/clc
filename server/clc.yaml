@@ -9,6 +9,7 @@ tasks:
 
 directories:
   scratch: /x1/scratch     # This is where all the git repos go - CHANGE IT TO SOMETHING USEFUL!
+  remove_bare: true        # If a bare repository is imported, and cannot be scanned, delete it automatically.
 
 # Default program paths
 executables:
