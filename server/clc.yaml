@@ -23,3 +23,7 @@ debug:
 acl:
 #  accounts_file: /x1/server/users.yaml
 #  auditlog: /x1/server/auditlog.txt
+
+# The below is for GitHub org imports to work. Uncomment and add your own API key
+# oauth:
+#   github_api_key: abcdefg1234
