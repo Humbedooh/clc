@@ -50,3 +50,11 @@ file has been provided in this repo, `users.sample.yaml`.
 
 The distinction between admin and user is that admins will be able to see the audit logs
 for the server, whereas normal users will not. Only plain logins are currently supported.
+
+## Importing entire organizations (GitHub etc)
+To support importing entire organizations, you will need to add a Personal Access Token to 
+the `clc.yaml` file, currently under the `oauth` section. This will ensure that CLC can use 
+the GraphQL interface in GitHub for grabbing the list of repos.
+
+If you need to sync the repos with an org, you can re-import, and any new repos discovered will 
+be added, while the old existing repositories will be retained as they were.
