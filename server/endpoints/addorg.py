@@ -98,9 +98,9 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
                             "excludes_context": [e for e in excludes_context if e],
                         }
                     )
+                    plugins.auditlog.log_entry(session, f"Added {repo_url} to list of projects")
                 else:
                     known += 1
-                    plugins.auditlog.log_entry(session, f"Added {repo_url} to list of projects")
             return {"okay": True, "message": f"{new} repositories added to scan queue, {known} already in the system."}
         else:
             return {"okay": False, "message": "No repositories could be found."}
