@@ -28,6 +28,7 @@ class OAuthConfig:
 class DirectoryConfig:
     def __init__(self, subyaml: dict):
         self.scratch = subyaml.get("scratch", "scratch")
+        self.remove_bare = subyaml.get("remove_bare", True)
         assert os.path.isdir(self.scratch), f"Scratch dir {self.scratch} could not be found, please create it or change clc.yaml!"
 
 class DebugConfig:
