@@ -507,7 +507,7 @@ function stacked_breakdown(source, chartDom, ctitle = '', legend=true) {
         },
         yAxis: [{
                 type: 'value',
-                name: "Word count"
+                name: "Issue count"
             },
             {
                 type: "value",
