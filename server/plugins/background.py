@@ -313,9 +313,9 @@ async def run_tasks(server: plugins.basetypes.Server):
             branch = item["branch"]
             reponame = url.split("/")[-1]
             destination = os.path.join(server.config.dirs.scratch, reponame)
-            params = ["clone", url, destination]
+            params = ["clone", "--depth=1", url, destination]
             if branch:
-                params = ["clone", "-b", branch, url, destination]
+                params = ["clone", "--depth=1", "-b", branch, url, destination]
             else:
                 branch = "$default"
             print(f"Checking out {url} ({branch}) into {destination}")
