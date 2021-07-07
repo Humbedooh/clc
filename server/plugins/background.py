@@ -15,6 +15,7 @@ import time
 import yaml
 import fnmatch
 import typing
+import shutil
 
 try:
     loader = typing.Union[yaml.Loader, yaml.CLoader]  # mypy fixups
@@ -284,6 +285,18 @@ async def scan_project(server, project, path):
     else:
         print(f"Could not pull in latest changes for {path}, ignoring for now...")
         print(stderr)
+        if b'unknown revision or path not in the working tree.' in stderr:
+            print("This repository appears to be a bare copy. We cannot scan it till a branch is added.")
+            if server.config.dirs.remove_bare:
+                try:
+                    print("Removing repository for now...")
+                    shutil.rmtree(path, ignore_errors=False)
+                except PermissionError as e:
+                    print("Could not remove repository path, oh well :/")
+                    print(e)
+                    project.settings["lastrun"] = int(time.time())  # Ignore till next scheduled run.
+            else:
+                project.settings["lastrun"] = int(time.time())  # Ignore till next scheduled run.
     server.data.activity = "Idling..."
 
 
