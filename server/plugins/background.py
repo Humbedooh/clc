@@ -142,6 +142,18 @@ async def scan_project(server, project, path):
     )
     stdout, stderr = await proc.communicate()
     assert proc.returncode == 0, "Git fetch returned non-null: " + str(stderr)
+    
+    params = (
+        "-C",
+        path,
+        "pull",
+    )
+    proc = await asyncio.create_subprocess_exec(
+        git_exec, *params, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await proc.communicate()
+    # git pull can fail, we don't care at this stage. We just want HEAD ref to update.
+    
     params = (
         "-C",
         path,
