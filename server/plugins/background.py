@@ -373,6 +373,7 @@ async def run_tasks(server: plugins.basetypes.Server):
             path = os.path.join(server.config.dirs.scratch, repo)
             _clc_yaml_path = os.path.join(path, "_clc.yaml")
             if not os.path.exists(_clc_yaml_path):
+                print(f"{_clc_yaml_path} was deleted, removing project from list.")
                 del server.data.projects[repo]
                 continue
             _clc_yaml_history_path = os.path.join(path, "_clc_history.yaml")
