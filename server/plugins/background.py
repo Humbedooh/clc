@@ -396,16 +396,22 @@ async def run_tasks(server: plugins.basetypes.Server):
                     reload_files = True
 
             if reload_files:
+                project_deleted = False
                 if os.path.exists(_clc_yaml_path):
                     yml = yaml.safe_load(open(_clc_yaml_path))
                     server.data.projects[repo].settings = yml
                     if mtime:
                         server.data.projects[repo].mtimes[_clc_yaml_path] = mtime.st_mtime
+                else:
+                    project_deleted = True
                 if os.path.exists(_clc_yaml_history_path):
                     yml = yaml.safe_load(open(_clc_yaml_history_path))
                     server.data.projects[repo].history = yml
                     if hmtime:
                         server.data.projects[repo].mtimes[_clc_yaml_history_path] = hmtime.st_mtime
+                if project_deleted:
+                    print(f"{_clc_yaml_path} was deleted, removing project from list.")
+                    del server.data.projects[repo]
             if mtime:
                 yml = server.data.projects[repo].settings
                 if "lastrun" in yml and yml["lastrun"] > time.time() - server.config.tasks.refresh_rate:
