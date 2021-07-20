@@ -52,7 +52,7 @@ class Server(plugins.basetypes.Server):
         self.server = None
 
         # Pre-load all standard yamls (except issues!)
-        for repo in os.listdir(self.config.dirs.scratch):
+        for repo in sorted(os.listdir(self.config.dirs.scratch)):
             clcymlpath = os.path.join(self.config.dirs.scratch, repo, "_clc.yaml")
             clchymlpath = os.path.join(self.config.dirs.scratch, repo, "_clc_history.yaml")
             project = plugins.configuration.Project(repo)
