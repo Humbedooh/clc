@@ -369,6 +369,17 @@ async def run_tasks(server: plugins.basetypes.Server):
             print("Done!")
             server.data.activity = "Idling..."
 
+        deleted_projects = []
+        for repo in server.data.projects:
+            path = os.path.join(server.config.dirs.scratch, repo)
+            _clc_yaml_path = os.path.join(path, "_clc.yaml")
+            if not os.path.exists(_clc_yaml_path):
+                print(f"{_clc_yaml_path} was deleted, removing project from list.")
+                deleted_projects.append(repo)
+        
+        for repo in deleted_projects:
+            del server.data.projects[repo]
+                
         for repo in sorted(os.listdir(server.config.dirs.scratch)):
             path = os.path.join(server.config.dirs.scratch, repo)
             _clc_yaml_path = os.path.join(path, "_clc.yaml")
