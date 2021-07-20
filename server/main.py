@@ -35,6 +35,14 @@ import plugins.configuration
 import plugins.formdata
 import plugins.session
 
+try:
+    loader = typing.Union[yaml.Loader, yaml.CLoader]  # mypy fixups
+    dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
+    from yaml import CLoader as loader, CDumper as dumper
+except:
+    from yaml import Loader as loader, Dumper as dumper
+
+
 CLC_VERSION = "0.1.0"
 
 
@@ -58,11 +66,11 @@ class Server(plugins.basetypes.Server):
             project = plugins.configuration.Project(repo)
             if os.path.exists(clcymlpath):
                 print(f"Loading {clcymlpath} ...")
-                project.settings = yaml.safe_load(open(clcymlpath))
+                project.settings = yaml.load(open(clcymlpath), Loader=loader)
                 project.mtimes[clcymlpath] = os.stat(clcymlpath).st_mtime
                 if os.path.exists(clchymlpath):
                     print(f"Loading {clchymlpath} ...")
-                    project.history = yaml.safe_load(open(clchymlpath))
+                    project.history = yaml.load(open(clchymlpath), Loader=loader)
                     project.mtimes[clchymlpath] = os.stat(clchymlpath).st_mtime
                 self.data.projects[repo] = project
 
