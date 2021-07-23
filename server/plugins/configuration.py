@@ -6,10 +6,11 @@ import yaml
 
 
 class ServerConfig:
-    def __init__(self, subyaml: dict):
+    def __init__(self, subyaml: dict, ver: tuple):
         self.ip: str = subyaml.get("bind", "0.0.0.0")
         self.port: int = int(subyaml.get("port", 8080))
         self.traceback: bool = bool(subyaml.get("traceback", False))
+        self.version = ver
 
 
 class TaskConfig:
@@ -67,8 +68,8 @@ class AccountConfig:
 
 
 class Configuration:
-    def __init__(self, yml: dict, dyml: dict):
-        self.server: ServerConfig = ServerConfig(yml.get("server", {}))
+    def __init__(self, clcversion: tuple, yml: dict, dyml: dict):
+        self.server: ServerConfig = ServerConfig(yml.get("server", {}), clcversion)
         self.tasks: TaskConfig = TaskConfig(yml.get("tasks", {}))
         self.oauth: OAuthConfig = OAuthConfig(yml.get("oauth", {}))
         self.dirs: DirectoryConfig = DirectoryConfig(yml.get("directories", {}))

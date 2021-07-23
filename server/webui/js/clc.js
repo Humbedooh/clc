@@ -234,6 +234,12 @@ async function prime_projects_list(sortkey=0) {
 
 
 
+async function prime_about() {
+    let ver = await GET('/api/version.json');
+    let obj = document.getElementById('version');
+    obj.innerText = ver.version_string;
+}
+
 
 async function prime_intro() {
     let details = stats_json ?  stats_json : await GET('/api/stats.json');

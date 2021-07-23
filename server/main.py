@@ -43,18 +43,19 @@ except:
     from yaml import Loader as loader, Dumper as dumper
 
 
-CLC_VERSION = "0.1.0"
+CLC_VERSION = (0,1,1)
+CLC_VERSION_STRING = ".".join([str(x) for x in CLC_VERSION])
 
 
 class Server(plugins.basetypes.Server):
     """Main server class, responsible for handling requests and scheduling offloader threads """
 
     def __init__(self, args: argparse.Namespace):
-        print("==== CLC Suite v/%s starting... ====" % CLC_VERSION)
+        print(f"==== CLC Suite v/{CLC_VERSION_STRING} starting... ====")
         # Load configuration
         yml = yaml.safe_load(open(args.config))
         dyml = yaml.safe_load(open(args.defaults))
-        self.config = plugins.configuration.Configuration(yml, dyml)
+        self.config = plugins.configuration.Configuration(CLC_VERSION, yml, dyml)
         self.data = plugins.configuration.InterData()
         self.handlers = dict()
         self.server = None
@@ -91,7 +92,7 @@ class Server(plugins.basetypes.Server):
 
         # Define response headers first...
         headers = {
-            "Server": "CLC Suite v/%s" % CLC_VERSION,
+            "Server": "CLC Suite v/%s" % CLC_VERSION_STRING,
         }
         # print(request.headers.get('X-Forwarded-For', request.remote), request.path)
         # Figure out who is going to handle this request, if any
