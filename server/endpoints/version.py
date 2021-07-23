@@ -24,7 +24,7 @@ import plugins.session
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
     return {
         "version": server.config.server.version,
-        "version_string": ".".join([str(x) for x in server.config.server.version])
+        "version_string": ".".join([str(x) for x in server.config.server.version]),
     }
 
 
