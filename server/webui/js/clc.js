@@ -122,6 +122,15 @@ async function add_org() {
     }
 }
 
+async function remove_repo() {
+    if (confirm("Are you sure you wish to delete this project and all of its scan history? This will remove the checkout on disk as well")) {
+        let rv = await POST('/api/rmproject.json', {
+            project: repository
+        });
+        alert(rv.message);
+        location.href = './';
+    }
+}
 
 // Saves/updates repository settings
 async function save_repo_settings() {
