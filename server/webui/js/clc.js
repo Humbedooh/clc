@@ -705,6 +705,18 @@ async function prime_analysis(limit) {
     document.getElementById('quickstats_epoch').innerText = new Date(stats.details.status.epoch*1000.0).toLocaleString();
     document.getElementById('reponame').innerText = stats.details.source;
 
+    if (stats.warning && stats.warning.length > 0) {
+        let wb = document.createElement('div');
+        wb.setAttribute('class', 'callout alert');
+        let t = document.createElement('h5');
+        let d = document.createElement('p');
+        t.innerText = "Warning: Scan failure detected!";
+        d.innerText = stats.warning;
+        wb.appendChild(t);
+        wb.appendChild(d);
+        document.getElementById('warning').appendChild(wb);
+    }
+
 }
 
 

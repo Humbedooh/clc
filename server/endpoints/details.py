@@ -79,6 +79,7 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             yml["excludes"] = yml.get("excludes", server.config.excludes)
             out["details"] = yml
             out["repo"] = project
+            out["warning"] = server.data.projects[project].warning
             out["reasons"] = server.config.contexts
             out["chart"] = [x, processed, issues, duration]
             out["breakdown"] = yml['status'].get('words_stacked')
