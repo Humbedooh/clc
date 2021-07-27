@@ -46,6 +46,7 @@ class Project:
         self.issues = []
         self.issues_per_file = {}
         self.deleted = False  # Is set to true when scheduled to removal by background services
+        self.warning = ""  # Set when a scan fails for whatever reason
 
 
 class LogicConfig:
