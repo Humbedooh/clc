@@ -443,6 +443,7 @@ async def run_tasks(server: plugins.basetypes.Server):
                 continue
             try:
                 await scan_project(server, server.data.projects[repo], path)
+                server.data.projects[repo].warning = ""  # Reset if all good
             except AssertionError as e:
                 right_now = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
                 server.data.projects[repo].warning = f"Error while scanning at {right_now}: {e}"  # Log a warning on scan failure, but continue
