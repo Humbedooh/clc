@@ -17,38 +17,30 @@
 
 import plugins.basetypes
 import plugins.session
+import plugins.auditlog
+import shutil
 import os
-import yaml
-import typing
 
-""" Quick Stats API end point for CLC"""
+""" Remove Project API end point for CLC"""
 
 
 async def process(server: plugins.basetypes.Server, session: plugins.session.SessionObject, indata: dict) -> dict:
-    out = {}
-    repos = []
-    for repo in os.listdir(server.config.dirs.scratch):
-        if repo in server.data.projects:
-            repos.append((repo, server.data.projects[repo].settings.get("lastrun", 0)))
-
-    repos = [x[0] for x in sorted(repos, key=lambda x: x[1], reverse=True)]
-
-    for repo in repos:
-        if server.data.projects[repo].deleted:
-            continue  # Skip removed projects
-        history = server.data.projects[repo].history
-        if history:
-            history = history[-20:]
-            issues = ["Issues discovered"]
-            x: typing.List[typing.Union[str, list]] = ["x"]
-            for scan in history:
-                issues.append(scan["issues"])
-                x.append([scan["epoch"], scan["files_processed"]])
-            out[repo] = [x, issues]
-    return {
-        "activity": server.data.activity,
-        "stats": out,
-    }
+    if session and (session.credentials or server.config.debug.open_server):
+        project = indata.get("project")
+        in_db = project in server.data.projects.keys()
+        if project and in_db:
+            plugins.auditlog.log_entry(session, f"Removed {project} from the list of projects")
+            project_path = os.path.join(server.config.dirs.scratch, project)
+            if os.path.exists(project_path):
+                server.data.projects[project].deleted = True
+            return {"okay": True, "message": "Project removed from scanner"}
+        else:
+            return {"okay": False, "message": "Project not found in scan list"}
+    else:
+        return {
+            "okay": False,
+            "message": "You need to be logged in to access this endpoint",
+        }
 
 
 def register(server: plugins.basetypes.Server):

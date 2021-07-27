@@ -370,15 +370,26 @@ async def run_tasks(server: plugins.basetypes.Server):
             server.data.activity = "Idling..."
 
         deleted_projects = []
-        for repo in server.data.projects:
+        for repo, data in server.data.projects.items():
             path = os.path.join(server.config.dirs.scratch, repo)
             _clc_yaml_path = os.path.join(path, "_clc.yaml")
             if not os.path.exists(_clc_yaml_path):
                 print(f"{_clc_yaml_path} was deleted, removing project from list.")
                 deleted_projects.append(repo)
+            if data.deleted:
+                print(f"{path} was scheduled for deletetion via the UI, removing files")
+                server.data.activity = f"Preparing to remove {path}..."
+                runner = plugins.offloader.ExecutorPool(threads=1)
+                try:
+                    await runner.run(shutil.rmtree, path, ignore_errors=False)
+                    deleted_projects.append(repo)
+                except Exception as e:
+                    print(f"Exception occurred while trying to remove {path}: {e}")
+                    server.data.activity = f"Successfully removed {path}..."
         
         for repo in deleted_projects:
-            del server.data.projects[repo]
+            if repo in server.data.projects:
+                del server.data.projects[repo]
                 
         for repo in sorted(os.listdir(server.config.dirs.scratch)):
             path = os.path.join(server.config.dirs.scratch, repo)

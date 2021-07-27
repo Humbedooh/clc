@@ -45,6 +45,7 @@ class Project:
         self.history = []
         self.issues = []
         self.issues_per_file = {}
+        self.deleted = False  # Is set to true when scheduled to removal by background services
 
 
 class LogicConfig:
