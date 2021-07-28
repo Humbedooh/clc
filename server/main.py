@@ -22,6 +22,7 @@ import asyncio
 import importlib
 import json
 import os
+import re
 import sys
 import traceback
 
@@ -45,6 +46,9 @@ except:
 
 CLC_VERSION = (0,1,2)
 CLC_VERSION_STRING = ".".join([str(x) for x in CLC_VERSION])
+CLC_VARS = {
+    "version": CLC_VERSION_STRING,
+}
 
 
 class Server(plugins.basetypes.Server):
@@ -156,12 +160,15 @@ class Server(plugins.basetypes.Server):
                         text="API error occurred. The application journal will have " "information. Error ID: %s" % eid,
                     )
         elif os.path.isfile(file_path):
-            f = open(file_path, "rb").read()
             ext = file_path.split(".")[-1]
             if ext in ("txt", "html", "js", "css"):
-                type = {"txt": "plain", "html": "html", "js": "javascript", "css": "css",}[ext]
-                return aiohttp.web.Response(headers=headers, status=200, content_type=f"text/{type}", body=f)
+                ctype = {"txt": "plain", "html": "html", "js": "javascript", "css": "css",}[ext]
+                f = open(file_path, "r").read()
+                if ext == 'html':
+                    f = re.sub(r"{clc::([a-z_]+)}", lambda x: CLC_VARS.get(x.group(1), '???'), f)
+                return aiohttp.web.Response(headers=headers, status=200, content_type=f"text/{ctype}", body=f)
             else:
+                f = open(file_path, "rb").read()
                 return aiohttp.web.Response(headers=headers, status=200, content_type=f"application/binary", body=f)
         else:
             return aiohttp.web.Response(headers=headers, status=404, text=f"API Endpoint {file_path} not found!")
