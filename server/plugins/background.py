@@ -383,13 +383,14 @@ async def run_tasks(server: plugins.basetypes.Server):
                 try:
                     await runner.run(shutil.rmtree, path, ignore_errors=False)
                     deleted_projects.append(repo)
+                    server.data.activity = f"Successfully removed {path}..."
                 except Exception as e:
                     print(f"Exception occurred while trying to remove {path}: {e}")
-                    server.data.activity = f"Successfully removed {path}..."
         
         for repo in deleted_projects:
             if repo in server.data.projects:
                 del server.data.projects[repo]
+        server.data.activity = f"Idling..."
                 
         for repo in sorted(os.listdir(server.config.dirs.scratch)):
             path = os.path.join(server.config.dirs.scratch, repo)
