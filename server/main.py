@@ -44,7 +44,7 @@ except:
     from yaml import Loader as loader, Dumper as dumper
 
 
-CLC_VERSION = (0,1,2)
+CLC_VERSION = (0,1,3)
 CLC_VERSION_STRING = ".".join([str(x) for x in CLC_VERSION])
 CLC_VARS = {
     "version": CLC_VERSION_STRING,
