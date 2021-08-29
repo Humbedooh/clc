@@ -1,4 +1,7 @@
-Changes in 1.1.2:
+Changes in 0.1.3:
+- Fixed the status line getting stuck when removing projects
+
+Changes in 0.1.2:
 
 - Added a simple mechanism for interpolating clc::foo vars into the UI HTML pages
 - Added a 'remove project' feature to the UI/API ([#5](https://github.com/Humbedooh/clc/issues/5))
