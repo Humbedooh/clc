@@ -32,6 +32,9 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
             repos.append((repo, server.data.projects[repo].settings.get("lastrun", 0)))
 
     repos = [x[0] for x in sorted(repos, key=lambda x: x[1], reverse=True)]
+    # If we only want the latest repos, for front page, crop the list
+    if indata.get('short'):
+        repos = repos[:20]
 
     for repo in repos:
         if server.data.projects[repo].deleted:
