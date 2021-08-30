@@ -251,7 +251,7 @@ async function prime_about() {
 
 
 async function prime_intro() {
-    let details = stats_json ?  stats_json : await GET('/api/stats.json');
+    let details = stats_json ?  stats_json : await GET('/api/stats.json?short=true');
     stats_json = details;
     details = typeof(details) == 'object' ? details : {stats: details, activity: 'unknown...!'};
     let stats = details.stats;
