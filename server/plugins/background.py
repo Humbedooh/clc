@@ -316,7 +316,7 @@ async def run_tasks(server: plugins.basetypes.Server):
     """
         Runs long-lived background data gathering tasks such as gathering repositories, projects and ldap/mfa data.
 
-        Generally runs every 2½ minutes, or whatever is set in tasks/refresh_rate in boxer.yaml
+        Generally runs every 2½ minutes, or whatever is set in tasks/refresh_rate in clc.yaml
     """
     git_exec = server.config.executables["git"]
     await asyncio.sleep(3)
