@@ -37,6 +37,8 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
     project = indata.get("project", "foo")
     path = os.path.join(server.config.dirs.scratch, project)
     limit = int(indata.get("limit", 1000))
+    if limit < 0:
+        limit = 0
     if os.path.isdir(path):
         assert ".." not in path, "Invalid path specified"
         assert "~" not in path, "Invalid path specified"
@@ -89,18 +91,20 @@ async def process(server: plugins.basetypes.Server, session: plugins.session.Ses
         if os.path.exists(ymlfile):
             ymldata = ""
             entries = 0
-            if limit < 2500:  # Slow async load if few lines requested
-                async with aiofiles.open(ymlfile) as f:
-                    async for line in f:
-                        if line.startswith("- "):
-                            entries += 1
-                            if entries > limit:
-                                break
-                        ymldata += line
-            else:  # If more requested, load everything at once
-                ymldata = open(ymlfile).read()
-            yml = yaml.load(ymldata, Loader=loader)
-            yml = yml[:limit]
+            yml = []
+            if limit:
+                if limit < 2500:  # Slow async load if few lines requested
+                    async with aiofiles.open(ymlfile) as f:
+                        async for line in f:
+                            if line.startswith("- "):
+                                entries += 1
+                                if entries > limit:
+                                    break
+                            ymldata += line
+                else:  # If more requested, load everything at once
+                    ymldata = open(ymlfile).read()
+                yml = yaml.load(ymldata, Loader=loader)
+                yml = yml[:limit]
             for issue in yml:
                 issue["path"] = issue["path"].replace(path, "", 1)
                 if not out["breakdown"]:
