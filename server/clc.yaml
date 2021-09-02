@@ -17,7 +17,7 @@ executables:
 
 # CLI debug settings
 debug:
-  print_issues: true  # Set to false to suppress all bad word findings in your CLI output
+  print_issues: true  # Set to false to suppress all matched words in your CLI output
   open_server: true   # This means ANYONE can edit your projects and settings. We trust people, right? right?!
 
 # User account settings - uncomment to enable
