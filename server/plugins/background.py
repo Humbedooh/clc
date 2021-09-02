@@ -176,7 +176,7 @@ async def scan_project(server, project, path):
         problems_found = 0
         current_issues = []
 
-        # Precompile all bad words
+        # Precompile all target words
         bad_words_stacked = {}
         bad_words_re = {}
         for word in bad_words:
