@@ -699,10 +699,11 @@ async function prime_analysis(limit) {
         $(this).toggleClass('is-active');
     });
 
+    let from_now = moment(stats.details.status.epoch*1000.0).fromNow();
     document.getElementById('quickstats_issues').innerText = stats.details.status.issues.pretty();
     document.getElementById('quickstats_files').innerText = stats.details.status.files_processed.pretty();
     document.getElementById('quickstats_duration').innerText = parseInt(stats.details.status.duration).pretty() + " seconds";
-    document.getElementById('quickstats_epoch').innerText = new Date(stats.details.status.epoch*1000.0).toLocaleString();
+    document.getElementById('quickstats_epoch').innerText = new Date(stats.details.status.epoch*1000.0).toLocaleString() + ` (${from_now})`;
     document.getElementById('reponame').innerText = stats.details.source;
 
     if (stats.warning && stats.warning.length > 0) {
