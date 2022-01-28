@@ -160,6 +160,9 @@ class Server(plugins.basetypes.Server):
                         text="API error occurred. The application journal will have " "information. Error ID: %s" % eid,
                     )
         elif os.path.isfile(file_path):
+            if not os.path.realpath(file_path).startswith(os.path.realpath('./webui')):
+                return aiohttp.web.Response(headers=headers, status=403, text=f"File {file_path} not authorized!")
+
             ext = file_path.split(".")[-1]
             if ext in ("txt", "html", "js", "css"):
                 ctype = {"txt": "plain", "html": "html", "js": "javascript", "css": "css",}[ext]
