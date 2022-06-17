@@ -41,7 +41,7 @@ try:
     dumper = typing.Union[yaml.Dumper, yaml.CDumper]  # mypy fixups
     from yaml import CLoader as loader, CDumper as dumper
 except:
-    from yaml import Loader as loader, Dumper as dumper
+    from yaml import SafeLoader as loader, Dumper as dumper
 
 
 CLC_VERSION = (0,1,3)
