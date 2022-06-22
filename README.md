@@ -6,8 +6,6 @@ words and sentences and tracks the development over time. It comes with a backgr
 indexer and a web server with a visual user interface for viewing reports and 
 adding/editing projects.
 
-A (currently read-only) demo of this service can be found at: https://clcdemo.net/
-
 
 ## Installation
 
