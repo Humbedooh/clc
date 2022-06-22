@@ -120,6 +120,8 @@ async def scan_project(server, project, path):
         excludes_context = yml["excludes_context"]
 
     scan_history = project.history
+    if scan_history is None:
+        scan_history = []
     server.data.activity = f"Preparing to scan {path}..."
 
     params = (
